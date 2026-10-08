@@ -56,8 +56,8 @@ last_verified: 2026-10-08
 
 ## Phase 3 — Version Control
 
-- [ ] Gitea repo `jason/karakeep`
-- [ ] GitHub `j2seattle/karakeep` (Jason; this laptop is `j2wavepoint`)
+- [x] Gitea repo `jason/karakeep` — `main` and tag `v0.1` pushed 2026-10-08
+- [ ] GitHub `j2seattle/karakeep` push mirror. The repo exists. This laptop's `gh` is `j2wavepoint` and got 403. Jason adds the mirror in Gitea → Settings → Mirror Settings. No sudo.
 - [ ] Push mirror
 - [ ] v0.1 tag
 
