@@ -174,11 +174,11 @@ Both returned `200 - OK` at 2026-10-08 17:31 UTC. Notification id 1 (Yingson Lab
 | Field | Value |
 |---|---|
 | API type | `rest` |
-| Auth | `api-key` after the first user exists. None issued. |
-| MCP | `needs-wrapper`. Homarr has no Karakeep kind. |
+| Auth | `api-key`. Key is in the laptop env file, not in git. |
+| MCP | `needs-wrapper`. Official `@karakeep/mcp` exists and can delete bookmarks, so it is not wired. Homarr has no Karakeep kind. |
 | Tier | `read-only` |
 
-The human UI is a login session. An API key is created in the app after the admin account exists, one key per consumer. Cursor would use `C:\Users\thedu\.cursor\mcps\karakeep.env`. That file does not exist yet.
+The human UI is a login session. The Cursor key is in `C:\Users\thedu\.cursor\mcps\karakeep.env`. Do not copy it into git or chat.
 
 Deleting bookmarks or `/opt/karakeep_data` is destructive. No token will be issued for that.
 
@@ -202,7 +202,7 @@ Restart, upgrade, and backup commands are in [docs/RUNBOOK.md](docs/RUNBOOK.md).
 
 ## 16. Open Items & Planned Changes
 
-- Jason fills `C:\Users\thedu\.cursor\mcps\karakeep.env` from Dashlane (`cursor-api-key`, and the admin user/password if he wants them in that file). Then say the file is filled so Cursor can be wired. Do not paste the values in chat.
+- A read-only Cursor wrapper, if one is wanted. The official server is not that wrapper.
 - Gate 7 restore and Gate 8 baselines are not done. The service is not R4 without them.
 
 ## Related

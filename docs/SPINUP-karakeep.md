@@ -57,9 +57,9 @@ last_verified: 2026-10-08
 ## Phase 3 — Version Control
 
 - [x] Gitea repo `jason/karakeep` — `main` and tag `v0.1` pushed 2026-10-08
-- [ ] GitHub `j2seattle/karakeep` push mirror. The repo exists. This laptop's `gh` is `j2wavepoint` and got 403. Jason adds the mirror in Gitea → Settings → Mirror Settings. No sudo.
-- [ ] Push mirror
-- [ ] v0.1 tag
+- [x] GitHub `j2seattle/karakeep` push mirror. Jason confirmed it was already configured and the Gitea commits were on GitHub (2026-10-08). Agents push Gitea only.
+- [x] Push mirror
+- [x] v0.1 tag
 
 ## Phase 4 — Monitoring
 
@@ -79,8 +79,8 @@ last_verified: 2026-10-08
 - [ ] Root password moved from `/root/karakeep-lxc-root.password` on the Proxmox host into Dashlane, then the file deleted
 - [x] Admin password in Dashlane (Jason, 2026-10-08)
 - [x] Cursor API key in Dashlane
-- [x] Laptop `C:\Users\thedu\.cursor\mcps\karakeep.env` created with blank values. Jason pastes the secrets there.
-- [ ] Cursor MCP — `needs-wrapper`, not wired
+- [x] Laptop `C:\Users\thedu\.cursor\mcps\karakeep.env` filled (Jason, 2026-10-08). Values stay in that file.
+- [ ] Cursor MCP — official `@karakeep/mcp` can delete bookmarks, so it stays unwired under the read-only ceiling
 - [x] PBS backup finished successfully. Snapshot `ct/136/2026-10-08T17:30:26Z`
 - [ ] Restore tested — not this pass
 

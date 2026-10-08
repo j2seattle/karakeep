@@ -61,4 +61,4 @@ Do not dump bookmark titles, URLs, or page archives into chat to "check that it 
 | Proxmox | `ssh proxmox` = `jason@192.168.30.209`, key `id_ed25519_lab` |
 | This guest | `ssh karakeep` after the Host block exists |
 | Web | `https://karakeep.yingson.com` → `192.168.30.33:3000` |
-| GitHub mirror | `github.com/j2seattle/karakeep` (Jason creates it; this laptop's `gh` is `j2wavepoint`) |
+| GitHub mirror | `github.com/j2seattle/karakeep` — Gitea push mirror, confirmed 2026-10-08. Push Gitea only. |

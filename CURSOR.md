@@ -27,7 +27,7 @@ last_verified: 2026-10-08
 
 ## Now
 
-Karakeep 0.33.2 is up. Tailscale only — no Cloudflare. Discord down and up confirmed. UniFi group and icon done. First account exists. Laptop env file is `C:\Users\thedu\.cursor\mcps\karakeep.env` with blank secret values until Jason fills them.
+Karakeep 0.33.2 is up. Tailscale only — no Cloudflare. Discord down and up confirmed. UniFi group and icon done. First account exists. `C:\Users\thedu\.cursor\mcps\karakeep.env` is filled. Do not print it. Publish by pushing Gitea `jason/karakeep`. GitHub `j2seattle/karakeep` is already the push mirror.
 
 ## Do not
 
@@ -38,4 +38,4 @@ Karakeep 0.33.2 is up. Tailscale only — no Cloudflare. Discord down and up con
 
 ## Next
 
-Jason pastes the Dashlane values into `C:\Users\thedu\.cursor\mcps\karakeep.env` and says the file is filled. Do not paste them in chat. Gate 7 restore is still open.
+Gate 7 restore is still open. Do not add `@karakeep/mcp` to Cursor. Its tools include delete.

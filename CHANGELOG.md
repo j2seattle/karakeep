@@ -29,4 +29,5 @@ All notable changes to **karakeep** are documented here. Prepend only.
 
 ## [Unreleased]
 
+- [OPS] Laptop `karakeep.env` is filled. GitHub mirror was already configured; Jason saw the Gitea commits on `j2seattle/karakeep`. Agents push Gitea only. Official MCP stays unwired.
 - [OPS] Jason confirmed Discord down/up, UniFi, and the first login. Tailscale only. Laptop `karakeep.env` created with blank secrets. Readiness R3.
