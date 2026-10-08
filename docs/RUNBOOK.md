@@ -60,6 +60,16 @@ sudo vzdump 136 --storage pbs-backups --mode snapshot --notes-template 'karakeep
 
 Confirm `TASK OK` in the task log. A snapshot existing is not a tested restore.
 
+## Import new Discord links
+
+New JSON files land in `C:\Users\thedu\discord-link-archive\items`. From the laptop, no sudo:
+
+```text
+python "C:\Development\Yingson Labs\karakeep\scripts\import-to-karakeep.py"
+```
+
+The script reads `C:\Users\thedu\.cursor\mcps\karakeep.env` and skips ids already recorded in `C:\Users\thedu\discord-link-archive\import-state.json`.
+
 ## Upgrade
 
 Use the community-script update path. It stops the three units, pulls the GitHub release, rebuilds on Node 22, migrates the database, and starts the units. Take a PBS snapshot first. Do not switch the guest to Node 24.
