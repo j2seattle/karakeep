@@ -23,7 +23,7 @@ last_verified: 2026-10-08
 
 # Architecture — Karakeep
 
-**Slug:** `karakeep` · **Status:** `in-progress` · **Host:** CT 136 / 192.168.30.33 · **Readiness:** R2
+**Slug:** `karakeep` · **Status:** `active` · **Host:** CT 136 / 192.168.30.33 · **Readiness:** R3
 
 ## Table of Contents
 
@@ -75,14 +75,14 @@ Resources are the helper script's tested size, not the lab default of 2 GB / 8 G
 |---|---|
 | LAN name | `https://karakeep.yingson.com` (NPM host 53 → `192.168.30.33:3000`) |
 | Direct | `http://192.168.30.33:3000` |
-| Off-LAN | Tailscale to the LAN name. No Cloudflare hostname. |
+| Off-LAN | Tailscale to the LAN name. No Cloudflare hostname. Jason confirmed that on 2026-10-08. |
 | UniFi | alias `karakeep-LXC`, fixed IP `192.168.30.33`, MAC `bc:24:11:bc:f5:e7` |
 
 AdGuard rewrite `karakeep.yingson.com` → `192.168.30.182` is `enabled: true` and `dig` against AdGuard returns that address.
 
 Same-host checks must use `http://127.0.0.1:3000`. `/etc/hosts` maps `karakeep.yingson.com` to the guest itself, so that name on the guest hits nothing on port 443.
 
-Proxmox Lab group and the client icon are still a human step in the UniFi UI.
+Proxmox Lab group and the client icon were set by Jason on 2026-10-08.
 
 ## 4. Components
 
@@ -167,7 +167,7 @@ There is no separate database dump. The SQLite file is inside the guest disk, so
 | `karakeep (DNS)` | `https://karakeep.yingson.com/` | 115 |
 | `karakeep (IP)` | `http://192.168.30.33:3000/` | 116 |
 
-Both returned `200 - OK` at 2026-10-08 17:31 UTC. Notification id 1 (Yingson Labs Discord `#alerts`). A down and a recovery were started the same day. Gate 5 stays open until Jason confirms those messages arrived.
+Both returned `200 - OK` at 2026-10-08 17:31 UTC. Notification id 1 (Yingson Labs Discord `#alerts`). Jason confirmed the down and the up the same day.
 
 ## 12. API & Automation Profile
 
@@ -188,7 +188,7 @@ Unprivileged container. Chromium is bound to localhost and started with `--no-sa
 
 The web UI is the only published port. Meilisearch and the browser debug port stay on localhost.
 
-No Cloudflare Access decision has been made. Do not publish the hostname on the tunnel until Jason says so.
+No Cloudflare hostname. Jason decided Tailscale only on 2026-10-08.
 
 ## 14. Known Issues & Constraints
 
@@ -202,8 +202,8 @@ Restart, upgrade, and backup commands are in [docs/RUNBOOK.md](docs/RUNBOOK.md).
 
 ## 16. Open Items & Planned Changes
 
-- Jason: Proxmox Lab group, client icon, first account, Dashlane items (then delete `/root/karakeep-lxc-root.password` on the Proxmox host), GitHub repo `j2seattle/karakeep` and the Gitea repo (the API token cannot create repos), Discord down/up confirmation, Cloudflare yes or no.
-- Agent: Gitea push after the repo exists. Gate 7 restore and Gate 8 baselines are not done. The service is not R4 without them.
+- Jason fills `C:\Users\thedu\.cursor\mcps\karakeep.env` from Dashlane (`cursor-api-key`, and the admin user/password if he wants them in that file). Then say the file is filled so Cursor can be wired. Do not paste the values in chat.
+- Gate 7 restore and Gate 8 baselines are not done. The service is not R4 without them.
 
 ## Related
 

@@ -23,19 +23,19 @@ last_verified: 2026-10-08
 
 # CURSOR — karakeep
 
-**Slug:** `karakeep` · **CT 136** · `192.168.30.33` · **R2**
+**Slug:** `karakeep` · **CT 136** · `192.168.30.33` · **R3**
 
 ## Now
 
-Karakeep 0.33.2 is up. `https://karakeep.yingson.com/signin` returns 200. NPM host 53. Kuma 115 and 116 are beating. Homarr tile is on YingsonDash. PBS snapshot `ct/136/2026-10-08T17:30:26Z` succeeded. `ssh karakeep` returns `jason`.
+Karakeep 0.33.2 is up. Tailscale only — no Cloudflare. Discord down and up confirmed. UniFi group and icon done. First account exists. Laptop env file is `C:\Users\thedu\.cursor\mcps\karakeep.env` with blank secret values until Jason fills them.
 
 ## Do not
 
 - Put `/opt/karakeep_data` on NFS. It is better-sqlite3.
 - Print `/etc/karakeep/karakeep.env` or `/root/karakeep-lxc-root.password`.
 - Reuse CT 109 or CT 131.
-- Open a Cloudflare hostname without Jason's decision.
+- Do not add a Cloudflare hostname. Jason decided Tailscale only on 2026-10-08.
 
 ## Next
 
-Jason: UniFi group `Proxmox Lab` and icon, first account, Dashlane, Gitea repo `jason/karakeep` (token lacks `write:user`), empty GitHub `j2seattle/karakeep`, confirm `#alerts`, say whether Cloudflare should be on.
+Jason pastes the Dashlane values into `C:\Users\thedu\.cursor\mcps\karakeep.env` and says the file is filled. Do not paste them in chat. Gate 7 restore is still open.

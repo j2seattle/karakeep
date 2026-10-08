@@ -29,4 +29,4 @@ All notable changes to **karakeep** are documented here. Prepend only.
 
 ## [Unreleased]
 
-- [OPS] CT 136 is up with Karakeep 0.33.2. `https://karakeep.yingson.com/signin` returns 200. NPM 53, Kuma 115/116, Homarr on YingsonDash, PBS snapshot `ct/136/2026-10-08T17:30:26Z`. `ssh karakeep` returns `jason`.
+- [OPS] Jason confirmed Discord down/up, UniFi, and the first login. Tailscale only. Laptop `karakeep.env` created with blank secrets. Readiness R3.

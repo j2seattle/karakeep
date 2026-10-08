@@ -33,8 +33,8 @@ last_verified: 2026-10-08
 - [x] LXC booted; UniFi has seen the MAC (`search_clients` returned `bc:24:11:bc:f5:e7`)
 - [x] Alias `karakeep-LXC` set (`update_dhcp_reservation`). `create_dhcp_reservation` then returned `api.err.MacUsed`
 - [ ] `get_dhcp_reservation` still returns not found — re-check in the UniFi UI
-- [ ] Added to `Proxmox Lab` group (Jason)
-- [ ] Custom icon set (Jason)
+- [x] Added to `Proxmox Lab` group (Jason, 2026-10-08)
+- [x] Custom icon set (Jason, 2026-10-08)
 - [x] IP recorded: `192.168.30.33`
 
 ## Phase 1 — Provisioning
@@ -52,7 +52,7 @@ last_verified: 2026-10-08
 - [x] Explicit AdGuard rewrite `karakeep.yingson.com` → `192.168.30.182`, enabled, and `dig` returns `.30.182`
 - [x] NPM proxy host 53 and a trusted certificate (`curl` without `-k` returned 200)
 - [x] `https://karakeep.yingson.com/signin` loads
-- [ ] External access decided. Interim: LAN + Tailscale, no Cloudflare, until Jason confirms
+- [x] External access decided. Tailscale only. No Cloudflare (Jason, 2026-10-08)
 
 ## Phase 3 — Version Control
 
@@ -66,7 +66,7 @@ last_verified: 2026-10-08
 - [x] DNS monitor 115
 - [x] IP monitor 116
 - [x] Kuma restarted. Both heartbeats `200 - OK` at 2026-10-08 17:31 UTC
-- [ ] Discord down + recovery seen by Jason. Kuma recorded both monitors down at 10:35 PT and up at 10:36 PT on 2026-10-08. Delivery in `#alerts` is his to confirm.
+- [x] Discord down + recovery seen by Jason (2026-10-08)
 
 ## Phase 5 — Dashboard
 
@@ -77,9 +77,9 @@ last_verified: 2026-10-08
 ## Phase 6 — Secrets & Backup
 
 - [ ] Root password moved from `/root/karakeep-lxc-root.password` on the Proxmox host into Dashlane, then the file deleted
-- [ ] Admin password in Dashlane after the first account exists
-- [ ] API key per consumer — blocked on the first account
-- [ ] Laptop `C:\Users\thedu\.cursor\mcps\karakeep.env` — blocked on the key
+- [x] Admin password in Dashlane (Jason, 2026-10-08)
+- [x] Cursor API key in Dashlane
+- [x] Laptop `C:\Users\thedu\.cursor\mcps\karakeep.env` created with blank values. Jason pastes the secrets there.
 - [ ] Cursor MCP — `needs-wrapper`, not wired
 - [x] PBS backup finished successfully. Snapshot `ct/136/2026-10-08T17:30:26Z`
 - [ ] Restore tested — not this pass

@@ -2,7 +2,7 @@
 
 Karakeep archives bookmarks, pages, and screenshots for the lab. It runs on CT 136 at `192.168.30.33` and is reached at `https://karakeep.yingson.com`.
 
-**Readiness:** R2. The name works with TLS. Not R3 until you confirm the Discord down and up. Not R4.
+**Readiness:** R3. Tailscale only. Not R4.
 
 | | |
 |---|---|
