@@ -29,6 +29,8 @@ All notable changes to **karakeep** are documented here. Prepend only.
 
 ## [Unreleased]
 
+- [OPS] Auto-tagging is on, summarization is off, and tag style is lowercase with hyphens. Jason's 26 curated tags were kept. Host rules tag github, x/twitter, reddit, and youtube on new bookmarks. Smart lists GitHub, Tools, and Agents follow those tags. A full retag was queued through Ollama on 2026-10-08.
+
 - [OPS] Auto-tagging uses Ollama on CT 112. The guest env holds `OPENAI_BASE_URL` and `INFERENCE_TEXT_MODEL=llama3.1:8b`. The API key field is the literal word `ollama`. AI Settings stays hidden until `karakeep-web` is restarted. Curated tags keep new links in the existing categories.
 
 - [OPS] The Discord-link importer lives in `scripts/import-to-karakeep.py`. It still reads new files from `C:\Users\thedu\discord-link-archive\items`.

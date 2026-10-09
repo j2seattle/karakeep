@@ -145,7 +145,18 @@ The live file is `/etc/karakeep/karakeep.env`. Names are listed in [.env.example
 
 The laptop file `C:\Users\thedu\.cursor\mcps\karakeep.env` is only the Cursor URL and API key. Inference settings belong in the guest file. After editing that file, restart both `karakeep-web` and `karakeep-workers`. The AI Settings link is hidden until the web process sees `OPENAI_API_KEY`.
 
-User Settings → **AI Settings** (`/settings/ai`): **Auto-tagging** on, **Curated Tags** limited to the categories already in use, **Tag Style** set to lowercase with hyphens. Auto-summarization stays off. New links are tagged after their crawl. The imported set is not retagged unless someone runs tagging from Admin → Background jobs.
+User Settings → **AI Settings** (`/settings/ai`), set 2026-10-08: **Auto-tagging** on, **Auto-summarization** off, **Tag Style** lowercase with hyphens. Curated tags are the 26 Jason already selected (`github`, `x`, `reddit`, `tools`, `agents`, and the rest of that set). A retag of the existing library was queued the same night through Ollama. Cards with no saved page text are skipped until they are recrawled.
+
+Rules fire when a bookmark is added. They do not retag the imported set:
+
+| Rule | Match | Tag |
+|---|---|---|
+| Host github.com | URL contains `github.com` | `github` |
+| Host x.com or twitter.com | URL contains `x.com` or `twitter.com` | `x` |
+| Host reddit.com | URL contains `reddit.com` | `reddit` |
+| Host youtube | URL contains `youtube.com` or `youtu.be` | `youtube` |
+
+Smart lists **GitHub** (`#github`), **Tools** (`#tools`), and **Agents** (`#agents`) sit beside the manual **Discord links** list. Favourites, Archive, and highlights are per card and stay Jason's.
 
 Vault references, when Jason has stored them:
 

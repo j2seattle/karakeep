@@ -62,4 +62,4 @@ Do not dump bookmark titles, URLs, or page archives into chat to "check that it 
 | This guest | `ssh karakeep` after the Host block exists |
 | Web | `https://karakeep.yingson.com` → `192.168.30.33:3000` |
 | GitHub mirror | `github.com/j2seattle/karakeep` — Gitea push mirror, confirmed 2026-10-08. Push Gitea only. |
-| Tagging | Ollama CT 112, `llama3.1:8b`, guest env only. UI: User Settings → AI Settings. |
+| Tagging | Ollama CT 112, `llama3.1:8b`. Auto-tagging on, summarization off, lowercase hyphens, 26 curated tags. Host rules on new bookmarks. Smart lists GitHub, Tools, Agents. |

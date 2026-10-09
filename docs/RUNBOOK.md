@@ -80,6 +80,10 @@ python "C:\Development\Yingson Labs\karakeep\scripts\import-to-karakeep.py"
 
 The script reads `C:\Users\thedu\.cursor\mcps\karakeep.env` and skips ids already recorded in `C:\Users\thedu\discord-link-archive\import-state.json`.
 
+## Tagging, rules, and lists
+
+AI Settings is on: auto-tagging, lowercase hyphens, summarization off, Jason's 26 curated tags. Host rules for github, x/twitter, reddit, and youtube run on new bookmarks only. Smart lists **GitHub**, **Tools**, and **Agents** follow those tags. A full retag was queued on 2026-10-08. Re-run it from Admin → Background jobs if a later batch needs the same pass. Favourites, Archive, and highlights are chosen on each card.
+
 ## Upgrade
 
 Use the community-script update path. It stops the three units, pulls the GitHub release, rebuilds on Node 22, migrates the database, and starts the units. Take a PBS snapshot first. Do not switch the guest to Node 24.

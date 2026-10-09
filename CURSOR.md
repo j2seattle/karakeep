@@ -27,7 +27,7 @@ last_verified: 2026-10-08
 
 ## Now
 
-Karakeep 0.33.2 is up. Tailscale only. Discord links from the laptop dump are imported. Auto-tagging uses Ollama on CT 112 (`llama3.1:8b`) through the guest env file. AI Settings is `/settings/ai` and only appears after `karakeep-web` has been restarted with that env. `C:\Users\thedu\.cursor\mcps\karakeep.env` is the Cursor key only. Do not print it. Publish by pushing Gitea `jason/karakeep`. GitHub follows that push.
+Karakeep 0.33.2 is up. Tailscale only, including the iOS app. Discord links are imported. Auto-tagging is on (Ollama `llama3.1:8b`, lowercase hyphens, summarization off, 26 curated tags). Host rules cover github, x/twitter, reddit, and youtube for new saves. Smart lists: GitHub, Tools, Agents. A library retag was queued 2026-10-08. `C:\Users\thedu\.cursor\mcps\karakeep.env` is the Cursor key only. Do not print it. Publish by pushing Gitea `jason/karakeep`. GitHub follows that push.
 
 ## Do not
 
