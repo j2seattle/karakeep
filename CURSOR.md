@@ -27,12 +27,13 @@ last_verified: 2026-10-08
 
 ## Now
 
-Karakeep 0.33.2 is up. Tailscale only — no Cloudflare. Discord down and up confirmed. UniFi group and icon done. First account exists. `C:\Users\thedu\.cursor\mcps\karakeep.env` is filled. Do not print it. Publish by pushing Gitea `jason/karakeep`. GitHub `j2seattle/karakeep` is already the push mirror.
+Karakeep 0.33.2 is up. Tailscale only. Discord links from the laptop dump are imported. Auto-tagging uses Ollama on CT 112 (`llama3.1:8b`) through the guest env file. AI Settings is `/settings/ai` and only appears after `karakeep-web` has been restarted with that env. `C:\Users\thedu\.cursor\mcps\karakeep.env` is the Cursor key only. Do not print it. Publish by pushing Gitea `jason/karakeep`. GitHub follows that push.
 
 ## Do not
 
 - Put `/opt/karakeep_data` on NFS. It is better-sqlite3.
 - Print `/etc/karakeep/karakeep.env` or `/root/karakeep-lxc-root.password`.
+- Put inference settings in the laptop `karakeep.env`. The guest file is the one the units read.
 - Reuse CT 109 or CT 131.
 - Do not add a Cloudflare hostname. Jason decided Tailscale only on 2026-10-08.
 

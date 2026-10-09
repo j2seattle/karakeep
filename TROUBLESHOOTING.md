@@ -35,6 +35,10 @@ NPM or the certificate. Direct `http://192.168.30.33:3000` bypasses both. If the
 
 `NEXTAUTH_URL` in `/etc/karakeep/karakeep.env` is probably still `http://localhost:3000`. Set it to `https://karakeep.yingson.com` and restart `karakeep-web`.
 
+## AI Settings is missing from User Settings
+
+The link is rendered only when the web process sees `OPENAI_API_KEY` or `OLLAMA_BASE_URL`. Those lines live in `/etc/karakeep/karakeep.env` on CT 136, not in the laptop `karakeep.env`. Restart `karakeep-web` after adding them, then open `https://karakeep.yingson.com/settings/ai`. A reload of the old process will not show the page.
+
 ## Workers are down and new bookmarks never archive
 
 ```bash

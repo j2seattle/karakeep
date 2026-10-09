@@ -60,6 +60,16 @@ sudo vzdump 136 --storage pbs-backups --mode snapshot --notes-template 'karakeep
 
 Confirm `TASK OK` in the task log. A snapshot existing is not a tested restore.
 
+## Restart after an env change
+
+`/etc/karakeep/karakeep.env` is read when each unit starts. From the laptop, this needs `sudo` on the guest:
+
+```text
+ssh karakeep "sudo systemctl restart karakeep-workers karakeep-web"
+```
+
+Restart the web unit as well as the workers. User Settings hides **AI Settings** until the web process has `OPENAI_API_KEY` in its environment.
+
 ## Import new Discord links
 
 New JSON files land in `C:\Users\thedu\discord-link-archive\items`. From the laptop, no sudo:

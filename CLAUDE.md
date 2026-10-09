@@ -32,11 +32,11 @@ last_verified: 2026-10-08
 | Field | Value |
 |---|---|
 | **Last reconciled** | 2026-10-08 |
-| **lab-standards commit** | `0e4a0c7` plus the uncommitted karakeep registration in that repo |
+| **lab-standards commit** | `6a449af` |
 | **Reconciled by** | Cursor Grok |
-| **Open items flowing up** | Cloudflare yes/no. First account and API key. Discord down/up confirmation. |
+| **Open items flowing up** | Gate 7 restore. Gate 8 baselines. Read-only Cursor wrapper. |
 
-At session start: `git -C ../lab-standards log -1 --format=%h`. If the SHA moved past `0e4a0c7`, read `lab-standards/CHANGELOG.md` since that commit before changing this service.
+At session start: `git -C ../lab-standards log -1 --format=%h`. If the SHA moved past `6a449af`, read `lab-standards/CHANGELOG.md` since that commit before changing this service.
 
 ## Read order
 
@@ -62,3 +62,4 @@ Do not dump bookmark titles, URLs, or page archives into chat to "check that it 
 | This guest | `ssh karakeep` after the Host block exists |
 | Web | `https://karakeep.yingson.com` → `192.168.30.33:3000` |
 | GitHub mirror | `github.com/j2seattle/karakeep` — Gitea push mirror, confirmed 2026-10-08. Push Gitea only. |
+| Tagging | Ollama CT 112, `llama3.1:8b`, guest env only. UI: User Settings → AI Settings. |

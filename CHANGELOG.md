@@ -29,6 +29,8 @@ All notable changes to **karakeep** are documented here. Prepend only.
 
 ## [Unreleased]
 
+- [OPS] Auto-tagging uses Ollama on CT 112. The guest env holds `OPENAI_BASE_URL` and `INFERENCE_TEXT_MODEL=llama3.1:8b`. The API key field is the literal word `ollama`. AI Settings stays hidden until `karakeep-web` is restarted. Curated tags keep new links in the existing categories.
+
 - [OPS] The Discord-link importer lives in `scripts/import-to-karakeep.py`. It still reads new files from `C:\Users\thedu\discord-link-archive\items`.
 
 - [OPS] Laptop `karakeep.env` is filled. GitHub mirror was already configured; Jason saw the Gitea commits on `j2seattle/karakeep`. Agents push Gitea only. Official MCP stays unwired.

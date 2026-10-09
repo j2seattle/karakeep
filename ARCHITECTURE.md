@@ -107,7 +107,7 @@ Workers start after the browser and Meilisearch. The web unit starts after the w
 
 Nothing depends on `karakeep`. Blast radius is Low.
 
-*Not applicable — Ollama.* Auto-tagging via Ollama is commented out in the env file. CT 112 is not a dependency until that is turned on.
+Ollama on CT 112 (`192.168.30.104:11434`) is used for auto-tagging only. The archive, crawl, and screenshots keep working if Ollama is down. Tagging jobs wait until it answers.
 
 *Not applicable — NAS.* See §7.
 
@@ -115,7 +115,7 @@ Nothing depends on `karakeep`. Blast radius is Low.
 
 A browser opens `https://karakeep.yingson.com`. NPM terminates TLS and forwards HTTP to `192.168.30.33:3000`. The web process reads and writes SQLite under `/opt/karakeep_data`. Saving a URL hands the job to the workers, which ask Chromium on localhost:9222 for a snapshot and send text to Meilisearch on localhost:7700.
 
-No request leaves the guest except the page the user asked to archive, and DNS/NTP for the guest itself.
+No request leaves the guest except the page the user asked to archive, the tagging call to Ollama on `192.168.30.104:11434`, and DNS/NTP for the guest itself.
 
 ## 7. Storage & Layout
 
@@ -139,6 +139,13 @@ The live file is `/etc/karakeep/karakeep.env`. Names are listed in [.env.example
 | `DATA_DIR` | `/opt/karakeep_data` |
 | `MEILI_ADDR` / `MEILI_MASTER_KEY` | Local search |
 | `BROWSER_WEB_URL` | `http://127.0.0.1:9222` |
+| `OPENAI_API_KEY` | The literal word `ollama`. This Ollama host has no API key. |
+| `OPENAI_BASE_URL` | `http://192.168.30.104:11434/v1` |
+| `INFERENCE_TEXT_MODEL` | `llama3.1:8b` |
+
+The laptop file `C:\Users\thedu\.cursor\mcps\karakeep.env` is only the Cursor URL and API key. Inference settings belong in the guest file. After editing that file, restart both `karakeep-web` and `karakeep-workers`. The AI Settings link is hidden until the web process sees `OPENAI_API_KEY`.
+
+User Settings → **AI Settings** (`/settings/ai`): **Auto-tagging** on, **Curated Tags** limited to the categories already in use, **Tag Style** set to lowercase with hyphens. Auto-summarization stays off. New links are tagged after their crawl. The imported set is not retagged unless someone runs tagging from Admin → Background jobs.
 
 Vault references, when Jason has stored them:
 
