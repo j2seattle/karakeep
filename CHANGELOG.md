@@ -2,8 +2,8 @@
 title: Changelog — karakeep
 version: 0.1.0
 status: active
-last_edited_by: Cursor Grok
-last_edited_date: 2026-10-08
+last_edited_by: Claude Code
+last_edited_date: 2026-10-24
 parent: README.md
 children: []
 siblings: [ARCHITECTURE.md, CURSOR.md, CLAUDE.md]
@@ -28,6 +28,8 @@ All notable changes to **karakeep** are documented here. Prepend only.
 ---
 
 ## [Unreleased]
+
+- [OPS] **Alloy log shipping recorded (2026-10-24).** CT 136 ships its journal to Loki (CT 138) through Alloy (apt package held at 1.21.2), labels `host=karakeep`, `service=karakeep`. Proxmox exporter and the Grafana lab dashboards also cover CT 136. Docs only. `no decision`.
 
 - [OPS] Auto-tagging is on, summarization is off, and tag style is lowercase with hyphens. Jason's 26 curated tags were kept. Host rules tag github, x/twitter, reddit, and youtube on new bookmarks. Smart lists GitHub, Tools, and Agents follow those tags. A full retag was queued through Ollama on 2026-10-08.
 

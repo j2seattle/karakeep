@@ -2,8 +2,8 @@
 title: Architecture — karakeep
 version: 0.1.0
 status: active
-last_edited_by: Cursor Grok
-last_edited_date: 2026-10-08
+last_edited_by: Claude Code
+last_edited_date: 2026-10-24
 parent: README.md
 children: []
 siblings: [CHANGELOG.md, CURSOR.md, BASELINES.md, TROUBLESHOOTING.md]
@@ -186,6 +186,8 @@ There is no separate database dump. The SQLite file is inside the guest disk, so
 | `karakeep (IP)` | `http://192.168.30.33:3000/` | 116 |
 
 Both returned `200 - OK` at 2026-10-08 17:31 UTC. Notification id 1 (Yingson Labs Discord `#alerts`). Jason confirmed the down and the up the same day.
+
+Logs go to Loki (CT 138) through Grafana Alloy, installed 2026-10-23 on CT 136: the apt package held at 1.21.2 ships the journal. Labels `host=karakeep` and `service=karakeep`. Query them in Grafana Explore (Loki data source). Rollout record: `docs/ALLOY-ROLLOUT.md` in the loki repo. The Proxmox exporter (Prometheus job `pve`) records CPU, memory, disk and network for every guest, and the Grafana dashboards "Lab overview (test)" and "Service view (test)" (folder Command Center) show each one. Uptime Kuma monitors are also scraped by Prometheus (job `uptime-kuma`) with `host` and `service` labels.
 
 ## 12. API & Automation Profile
 
