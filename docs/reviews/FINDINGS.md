@@ -16,7 +16,7 @@ permission_tier: n-a
 last_verified: 2026-11-01
 ---
 
-Page: PENDING
+Page: https://claude.ai/artifact/5gJV9T8DxzNjFLVrW5bw2v (private)
 
 # Findings: karakeep
 
@@ -26,7 +26,7 @@ Process: lab-standards `docs/SERVICE-REVIEW.md` · Run log: lab-standards `servi
 |---|---|---|---|---|
 | 1 | 2026-11-01 | review (read only, nothing changed on any server) | critical 0, high 3, medium 21, low 43 (67 total) | [2026-11-01-service-review.md](2026-11-01-service-review.md) |
 
-Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from another session, used as leads only), lab-standards `45dc495`. Every finding is `new`. IDs are never reused. Severity rulings by the coordinator are applied: BAK-01 high, BAK-02 medium, PAT-02 medium, DOC-01 medium.
+Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from another session, used as leads only), lab-standards `45dc495`. Every finding is `new` except INT-04, which is moved to WISH-088. IDs are never reused. Severity rulings by the coordinator are applied: BAK-01 high, BAK-02 medium, PAT-02 medium, DOC-01 medium.
 
 ## Open findings
 
@@ -41,10 +41,10 @@ Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from an
 | PAT-01 | medium | Karakeep is two releases behind upstream, including a security release | LAB-DEC-022 | jason | M | destructive | Yes | verified | new |
 | PAT-02 | medium | Three security updates are pending, two of them for the browser that renders saved pages | SERVICE-REVIEW A | jason | S | remediate | Yes | verified | new |
 | BAK-02 | medium | The PBS backup has never been restored, and an upgrade whose rollback depends on it is pending | Gate 7 | jason | M | remediate | Yes | verified | new |
-| BAK-04 | medium | No alert fires if the nightly PBS backup of CT 136 (or any guest) goes missing or stale | LAB-DEC-053 | a named lane (lab-wide: lane N or the prometheus repo) | S | remediate | No | verified | new |
+| BAK-04 | medium | No alert fires if the nightly PBS backup of CT 136 (or any guest) goes missing or stale | LAB-DEC-053 | chief | S | remediate | No | verified | new |
 | BAK-05 | medium | Whether the secrets needed to rebuild karakeep are in Dashlane is not known | Gate 7 | jason | S | none | Yes | unverified | new |
 | HLT-02 | medium | Gate 8 baselines are all "not yet measured" | Gate 8 | jason | M | none | No | verified | new |
-| SPD-05 | medium | BASELINES.md has no measured numbers (Gate 8 open) | Gate 8 | lane A | S | none | No | verified | new |
+| SPD-05 | medium | BASELINES.md has no measured numbers (Gate 8 open) | Gate 8 | chief | S | none | No | verified | new |
 | INT-01 | medium | OpenRouter is a live dependency that no lab table declares; bookmark content already leaves the lab for tagging | SERVICE-REVIEW D | jason | S | none | Yes | unverified | new |
 | MON-05 | medium | Full bookmark URLs, some from sign-in sessions, are shipped to Loki | none | jason | M | remediate | Yes | verified | new |
 | DOC-01 | medium | HEAD of the karakeep repo says tagging uses Ollama CT 112; live uses OpenRouter | SERVICE-REVIEW H | jason | S | none | Yes | verified | new |
@@ -70,28 +70,28 @@ Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from an
 | PAT-05 | low | The version-tracking record is incomplete | LAB-STANDARDS §12 | jason | S | none | No | verified | new |
 | BAK-03 | low | Per-guest PBS verify state for CT 136 cannot be seen | none | jason | S | none | No | unverified | new |
 | HLT-01 | low | LxcSwapFull has been firing for CT 136 since 2026-10-29 and swap has stayed at about 92% or higher for 7 days | Gate 8 | jason | S | remediate | Yes | verified | new |
-| HLT-03 | low | The SRE good-check has no stored reading | Gate 6 | lane N or chief | S | none | No | verified | new |
-| HLT-04 | low | The Homarr tile and the 503-on-failure health behaviour were not checked | LAB-STANDARDS §7 | lane N or jason | S | none | No | unverified | new |
-| HLT-05 | low | Load average reads 4.7 on a 2 vCPU guest while CPU pressure is low | none | lane N | S | none | No | verified | new |
+| HLT-03 | low | The SRE good-check has no stored reading | Gate 6 | chief | S | none | No | verified | new |
+| HLT-04 | low | The Homarr tile and the 503-on-failure health behaviour were not checked | LAB-STANDARDS §7 | jason | S | none | No | unverified | new |
+| HLT-05 | low | Load average reads 4.7 on a 2 vCPU guest while CPU pressure is low | none | chief | S | none | No | verified | new |
 | SPD-01 | low | Swap is nearly full on CT 136; RAM is not under pressure | Gate 8 | chief | S | remediate | No | verified | new |
 | SPD-02 | low | Load average far above CPU use, cause not identified | none | chief | S | none | No | verified | new |
 | SPD-03 | low | Kuma 115 (DNS path) has a 28 second response in 7 days; the IP path does not | SERVICE-REVIEW C | chief | S | none | No | verified | new |
 | SPD-04 | low | Root disk grows about 110 MB a day | Gate 8 | chief | S | none | No | verified | new |
 | INT-02 | low | OpenRouter spend cannot be tied to karakeep | SERVICE-REVIEW D | jason | S | none | Yes | verified | new |
-| INT-03 | low | Dependency edges are not declared in both directions | SERVICE-REVIEW D | lane U | S | none | No | verified | new |
+| INT-03 | low | Dependency edges are not declared in both directions | SERVICE-REVIEW D | chief | S | none | No | verified | new |
 | INT-04 | low | The Discord link import is a manual laptop script (WISH-088) | none | jason | M | remediate | Yes | verified | moved to WISH-088 (existing) |
 | MON-02 | low | The health check is shallow | LAB-STANDARDS §7 | upstream | L | none | No | unverified | new |
 | MON-03 | low | Kuma only alerts on "down for 2 minutes"; slow and flapping on the name path is silent | LAB-DEC-078 | chief | S | none | No | unverified | new |
 | MON-04 | low | Karakeep errors reach Loki but nothing alerts on them | none | chief | M | remediate | No | verified | new |
 | DOC-03 | low | TOOLS.yaml OpenRouter `lab_use` names only Hermes | SERVICE-REVIEW H | chief | S | none | No | verified | new |
 | DOC-05 | low | "three units" in health checks; live has four | SERVICE-REVIEW H | chief | S | none | No | verified | new |
-| DOC-06 | low | Sync receipt `6a449af` is 244 commits behind lab-standards | SERVICE-REVIEW H | lane A | S | none | No | verified | new |
-| DOC-08 | low | No LAB-STANDARDS section 12 upgrade backlog row for karakeep | LAB-STANDARDS §12 | lane A | S | none | No | verified | new |
-| DOC-09 | low | App version is answerable live (public `/api/version`) but no doc says how to check it | SERVICE-REVIEW H | lane A | S | none | No | verified | new |
-| DOC-10 | low | `last_verified` dates need a refresh after this review | SERVICE-REVIEW H | lane A | S | none | No | verified | new |
+| DOC-06 | low | Sync receipt `6a449af` is 244 commits behind lab-standards | SERVICE-REVIEW H | chief | S | none | No | verified | new |
+| DOC-08 | low | No LAB-STANDARDS section 12 upgrade backlog row for karakeep | LAB-STANDARDS §12 | chief | S | none | No | verified | new |
+| DOC-09 | low | App version is answerable live (public `/api/version`) but no doc says how to check it | SERVICE-REVIEW H | chief | S | none | No | verified | new |
+| DOC-10 | low | `last_verified` dates need a refresh after this review | SERVICE-REVIEW H | chief | S | none | No | verified | new |
 | DOC-11 | low | Doc claims this review could not check (privileged, onboot, features, port owners, Meilisearch version) | SERVICE-REVIEW H | jason | S | none | Yes | unverified | new |
 | DOC-12 | low | Swap is 92% used and no doc mentions it | none | chief | S | none | No | verified | new |
-| DOC-13 | low | Working tree leftovers: TROUBLESHOOTING names the Ollama variable; same day changelog entries have no times | SERVICE-REVIEW H | lane A | S | none | No | verified | new |
+| DOC-13 | low | Working tree leftovers: TROUBLESHOOTING names the Ollama variable; same day changelog entries have no times | SERVICE-REVIEW H | chief | S | none | No | verified | new |
 | USE-04 | low | Webhooks unused | none | chief | M | remediate | No | unverified | new |
 | USE-05 | low | Per consumer API keys: only the Cursor key is documented | SERVICE-REVIEW I | jason | S | none | Yes | unverified | new |
 | USE-06 | low | Lab slug tags as join keys | none | chief | M | remediate | Yes | unverified | new |
@@ -313,7 +313,7 @@ Category BAK · Severity low · State new
 
 Category BAK · Severity medium · State new
 
-- Category BAK · Standard: LAB-DEC-053 · Owner: a named lane (lab-wide, lane N or the prometheus repo) · Severity: **medium** (a failure that would not alert; kept at medium because PBS tracks job health and nothing has failed) · Effort: S · Checked: verified for Prometheus rules; **unverified** for any Kuma or Alertmanager path outside Prometheus rules · Approval: remediate · Your call: no
+- Category BAK · Standard: LAB-DEC-053 · Owner: chief · Severity: **medium** (a failure that would not alert; kept at medium because PBS tracks job health and nothing has failed) · Effort: S · Checked: verified for Prometheus rules; **unverified** for any Kuma or Alertmanager path outside Prometheus rules · Approval: remediate · Your call: no
 - Evidence: the live Prometheus rules list has no expression using `pbs_group_last_backup_timestamp_seconds`, `pbs_job_last_run_ok` or `pve_not_backed_up_total`. The metrics exist and are healthy now. INC-20260415-01 was a silent backup failure.
 - Fix: an alert such as `time() - pbs_group_last_backup_timestamp_seconds > 36h` for any group, routed through Alertmanager to `#alerts`. Lab-wide, so listed once here and not repeated per service.
 - Links: INC-20260415-01, WISH-257 (proposed). State: new.
@@ -353,7 +353,7 @@ Category HLT · Severity medium · State new
 
 Category HLT · Severity low · State new
 
-- Category HLT · Standard: Gate 6 · Owner: a named lane (lane N) or chief · Severity: low · Effort: S · Checked: verified · Approval: none · Your call: no
+- Category HLT · Standard: Gate 6 · Owner: chief · Severity: low · Effort: S · Checked: verified · Approval: none · Your call: no
 - Evidence: `SRE-AGENT-CATALOG.md:185` says "Reading not stored as a catalog baseline". I ran the check today and it passes (200 on `/signin`, three units active), so the reading can be stored now.
 - Fix: store the 2026-11-01 reading. `watch: no` stays until then.
 - State: new.
@@ -363,7 +363,7 @@ Category HLT · Severity low · State new
 
 Category HLT · Severity low · State new
 
-- Category HLT · Standard: `LAB-STANDARDS §7` · Owner: lane N or jason · Severity: low · Effort: S · Checked: **unverified** · Approval: none · Your call: no
+- Category HLT · Standard: `LAB-STANDARDS §7` · Owner: jason · Severity: low · Effort: S · Checked: **unverified** · Approval: none · Your call: no
 - Evidence: no allowlisted live read for Homarr; `/api/health` 200 seen but 503 not testable without stopping a unit (ground rule 9).
 - Fix: Jason opens YingsonDash and confirms the tile.
 - Links: LAB-STANDARDS §8 (Homarr tile). State: new.
@@ -372,7 +372,7 @@ Category HLT · Severity low · State new
 
 Category HLT · Severity low · State new
 
-- Category HLT · Standard: none · Owner: lane N (SPD) · Severity: low · Effort: S · Checked: verified for the reading, **unverified** for the cause · Approval: none · Your call: no
+- Category HLT · Standard: none · Owner: chief · Severity: low · Effort: S · Checked: verified for the reading, **unverified** for the cause · Approval: none · Your call: no
 - Evidence: `uptime` 10:05, load 4.71, 5.28, 5.52; `/proc/pressure/cpu` some avg300 0.14; `ps` shows no busy process. In an LXC the load average can come from the host. Left to SPD to confirm or drop.
 - State: new.
 - Cross-links (lane A): SPD-02 (same load reading)
@@ -420,7 +420,7 @@ Category SPD · Severity low · State new
 
 Category SPD · Severity medium · State new
 
-- Standard: Gate 8. Owner: a named agent lane (lane A, the only writer to karakeep). Severity: medium. Effort: S. Approval: none. Your call: no.
+- Standard: Gate 8. Owner: chief. Severity: medium. Effort: S. Approval: none. Your call: no.
 - Evidence: `karakeep/BASELINES.md` (HEAD and working tree) says "not yet measured" for health, CPU, RAM, disk and swap, and "Do not invent a threshold from the 4 GB allocation".
 - Numbers this run measured, for the file (labelled as one sample, laptop on LAN, 5 runs each):
 
@@ -443,7 +443,7 @@ Category SPD · Severity medium · State new
 
 Category INT · Severity medium · State new
 
-- Standard: SERVICE-REVIEW D. Owner: jason (decision), lane U (docs). Severity: medium. Effort: S for the doc; the privacy decision is Jason's. Approval: none. Your call: yes.
+- Standard: SERVICE-REVIEW D. Owner: jason. Severity: medium. Effort: S for the doc; the privacy decision is Jason's. Approval: none. Your call: yes.
 - Evidence: Loki 7 days, `{service="karakeep",unit="karakeep-web.service"} |~ "(?i)openrouter"` = 312 lines (D0 counted 316 across all units, and 0 for `11434`). `SERVICE-DEPENDENCIES.md:137` says Ollama CT 112 for tagging, and the `TOOLS.yaml` OpenRouter `lab_use` names only Hermes. The working tree `ARCHITECTURE.md` and `RUNBOOK.md` say OpenRouter `google/gemini-2.5-flash-lite` for text and images (RUNBOOK Tagging section, line 85 of the working tree). The guest env cannot be read, so the live model name, and exactly which fields are sent, are unverified. Whether images are sent is also unverified (the working tree says the image model is set).
 - What this means: saving a bookmark sends page text, and possibly images, to OpenRouter and from there to Google. The 844 bookmarks retagged on 2026-10-12 went the same way (working-tree CHANGELOG, a lead). WISH-244 already asks whether agents may read bookmark text; the tagging path answers part of it today.
 - Checked: unverified for what is sent (model name, fields, images); the OpenRouter log lines are verified. Env file read needs sudo on CT 136.
@@ -465,7 +465,7 @@ Category INT · Severity low · State new
 
 Category INT · Severity low · State new
 
-- Standard: SERVICE-REVIEW D (edges both ways). Owner: lane U. Severity: low. Effort: S. Approval: none. Your call: no.
+- Standard: SERVICE-REVIEW D (edges both ways). Owner: chief. Severity: low. Effort: S. Approval: none. Your call: no.
 - Evidence: `SERVICE-DEPENDENCIES.md:137` says "Nothing else calls Karakeep" and lists no OpenRouter, Loki or Alloy. Live: the laptop holds `karakeep.env`, `karakeep-hermes.env` and `karakeep-openrouter.env` under `~/.cursor/mcps` (names only), so at least Hermes and Cursor have or are meant to have a credential. `SERVICE-INVENTORY.md:295` lists the API as `rest`, `api-key`, MCP `needs-wrapper`, tier `read-only`. Live: `GET /api/v1/bookmarks` without a key returns 401 on `192.168.30.33:3000`, so the API answers and wants a key. Logs flow to Loki through Alloy (unit `alloy.service` active; Loki `service="karakeep"` present, D0). The Discord link archive on the laptop feeds Karakeep by script (INT-04).
 - Checked: verified for the 401 and the SERVICE-DEPENDENCIES text; unverified whether Hermes calls karakeep (CT 139 credential read needs root).
 - Fix: lane U adds edges: karakeep to OpenRouter, to Loki (Alloy), and from the laptop import script and Hermes (read key). Whether Hermes actually calls Karakeep today is unverified (CT 139 credential store is root only). Links: INT-01. State: new.
@@ -533,7 +533,7 @@ Category MON · Severity medium · State new
 
 Category DOC · Severity medium · State new
 
-- Standard: SERVICE-REVIEW H · Owner: jason, then lane A · Severity: medium (coordinator ruling 2026-11-01; lane U rated it high) · Effort: S · Approval: none
+- Standard: SERVICE-REVIEW H · Owner: jason · Severity: medium (coordinator ruling 2026-11-01; lane U rated it high) · Effort: S · Approval: none
 - Evidence: `git show HEAD:ARCHITECTURE.md` lines 110, 118; Loki 7 day: 316 openrouter lines, 0 lines with 11434 (D0)
 - Checked: verified (Loki log lines; the configured values in the root-only env file would verify directly)
 - Your call: Yes: who commits the 7 working tree files
@@ -601,7 +601,7 @@ Category DOC · Severity low · State new
 
 Category DOC · Severity low · State new
 
-- Standard: SERVICE-REVIEW H · Owner: lane A · Severity: low · Effort: S · Approval: none
+- Standard: SERVICE-REVIEW H · Owner: chief · Severity: low · Effort: S · Approval: none
 - Evidence: CLAUDE.md sync table; D0 section Basis
 - Checked: verified
 - Your call: no
@@ -628,7 +628,7 @@ Category DOC · Severity medium · State new
 
 Category DOC · Severity low · State new
 
-- Standard: LAB-STANDARDS §12 · Owner: lane A · Severity: low · Effort: S · Approval: none
+- Standard: LAB-STANDARDS §12 · Owner: chief · Severity: low · Effort: S · Approval: none
 - Evidence: D0 section 4: 0 karakeep hits in the table
 - Checked: verified
 - Your call: no
@@ -642,7 +642,7 @@ Category DOC · Severity low · State new
 
 Category DOC · Severity low · State new
 
-- Standard: SERVICE-REVIEW H · Owner: lane A · Severity: low · Effort: S · Approval: none
+- Standard: SERVICE-REVIEW H · Owner: chief · Severity: low · Effort: S · Approval: none
 - Evidence: `curl http://192.168.30.33:3000/api/version` returns 0.33.2
 - Checked: verified
 - Your call: no
@@ -655,7 +655,7 @@ Category DOC · Severity low · State new
 
 Category DOC · Severity low · State new
 
-- Standard: SERVICE-REVIEW H · Owner: lane A · Severity: low · Effort: S · Approval: none
+- Standard: SERVICE-REVIEW H · Owner: chief · Severity: low · Effort: S · Approval: none
 - Evidence: HEAD 2026-10-08, WT 2026-10-12
 - Checked: verified
 - Your call: no
@@ -697,7 +697,7 @@ Category DOC · Severity low · State new
 
 Category DOC · Severity low · State new
 
-- Standard: SERVICE-REVIEW H · Owner: lane A · Severity: low · Effort: S · Approval: none
+- Standard: SERVICE-REVIEW H · Owner: chief · Severity: low · Effort: S · Approval: none
 - Evidence: WT TROUBLESHOOTING.md:40; WT CHANGELOG.md on/off entries
 - Checked: verified
 - Your call: no
