@@ -1,0 +1,8 @@
+[Unit]
+Description=Nightly Karakeep database copy, env and assets snapshot into Kopia (CT 136)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/kopia-backup-karakeep.sh
