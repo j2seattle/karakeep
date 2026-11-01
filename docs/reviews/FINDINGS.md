@@ -74,7 +74,7 @@ Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from an
 | BAK-03 | low | Per-guest PBS verify state for CT 136 cannot be seen | none | jason | S | none | No | unverified | fixed (verified) 2026-11-01 |
 | HLT-01 | low | LxcSwapFull has been firing for CT 136 since 2026-10-29 and swap has stayed at about 92% or higher for 7 days | Gate 8 | jason | S | remediate | Yes | verified | fixed (verified) 2026-11-01 |
 | HLT-03 | low | The SRE good-check has no stored reading | Gate 6 | chief | S | none | No | verified | fixed (verified) 2026-11-01 |
-| HLT-04 | low | The Homarr tile and the 503-on-failure health behaviour were not checked | LAB-STANDARDS §7 | jason | S | none | No | unverified | still open: Homarr half read 2026-11-01 (tile exists, pings http://192.168.30.33:3000/ by IP); Homarr .107 is now blocked by the port 3000 rule so the tile should read down; 503 half needs a stop |
+| HLT-04 | low | The Homarr tile and the 503-on-failure health behaviour were not checked | LAB-STANDARDS §7 | jason | S | none | No | unverified | still open: Homarr half done 2026-11-01 (tile exists, pings by IP, CT 103 allowed, curl returns 307). The 503 half needs a stop. |
 | HLT-05 | low | Load average reads 4.7 on a 2 vCPU guest while CPU pressure is low | none | chief | S | none | No | verified | fixed (verified) 2026-11-01 (explained: host load average) |
 | SPD-01 | low | Swap is nearly full on CT 136; RAM is not under pressure | Gate 8 | chief | S | remediate | No | verified | fixed (verified) 2026-11-01 |
 | SPD-02 | low | Load average far above CPU use, cause not identified | none | chief | S | none | No | verified | fixed (verified) 2026-11-01 (explained: load average is the Proxmox host number) |

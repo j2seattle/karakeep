@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting — karakeep
-version: 0.1.0
+version: 0.1.1
 status: active
 last_edited_by: Claude Code
 last_edited_date: 2026-11-01
@@ -29,7 +29,7 @@ last_verified: 2026-11-01
 
 ## The page opens on the IP and fails on the name
 
-NPM or the certificate. Since 2026-11-01 the laptop can no longer open `http://192.168.30.33:3000` (the guest firewall lets in only the guest itself, NPM `.182`, Kuma `.130`, Prometheus `.62`, Command Center `.94` and Scanopy `.25`). To test the app without NPM, run `ssh karakeep` and then `curl -s http://127.0.0.1:3000/api/health`. If that works and the name does not, fix NPM, not Karakeep.
+NPM or the certificate. Since 2026-11-01 the laptop can no longer open `http://192.168.30.33:3000` (the guest firewall lets in only the guest itself, NPM `.182`, Kuma `.130`, Prometheus `.62`, Command Center `.94`, Scanopy `.25` and Homarr `.107`). To test the app without NPM, run `ssh karakeep` and then `curl -s http://127.0.0.1:3000/api/health`. If that works and the name does not, fix NPM, not Karakeep.
 
 To let a new reader in on port 3000, add its address to the set in `/etc/nftables.conf` on CT 136 and run `sudo nft -f /etc/nftables.conf`. Undo: remove the address from the file and reload. Dropped attempts show in `journalctl -k` with the prefix `kk3000-drop`.
 

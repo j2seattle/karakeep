@@ -1,6 +1,6 @@
 ---
 title: Architecture — karakeep
-version: 0.1.0
+version: 0.1.1
 status: active
 last_edited_by: Claude Code
 last_edited_date: 2026-11-01
@@ -74,7 +74,7 @@ Resources are the helper script's tested size, not the lab default of 2 GB / 8 G
 | Path | Target |
 |---|---|
 | LAN name | `https://karakeep.yingson.com` (NPM host 53 → `192.168.30.33:3000`) |
-| Direct | `http://192.168.30.33:3000`, but only these sources are let in (nftables on the guest, 2026-11-01): the guest itself, NPM `.182`, Kuma `.130`, Prometheus `.62`, Command Center `.94` and Scanopy `.25`. The laptop is not let in. Use the name, or `ssh karakeep` and then `127.0.0.1:3000`. Homarr (`.107`) is not on the list (see section 14). |
+| Direct | `http://192.168.30.33:3000`, but only these sources are let in (nftables on the guest, 2026-11-01): the guest itself, NPM `.182`, Kuma `.130`, Prometheus `.62`, Command Center `.94`, Scanopy `.25` and Homarr `.107`. The laptop is not let in. Use the name, or `ssh karakeep` and then `127.0.0.1:3000`. Homarr (`.107`) is not on the list (see section 14). |
 | Off-LAN | Tailscale to the LAN name. No Cloudflare hostname. Jason confirmed that on 2026-10-08. |
 | UniFi | alias `karakeep-LXC`, fixed IP `192.168.30.33`, MAC `bc:24:11:bc:f5:e7` |
 
@@ -237,7 +237,7 @@ No Cloudflare hostname. Jason decided Tailscale only on 2026-10-08.
 - The install log on the Proxmox host is `/var/log/karakeep-ct-create.log`.
 - `get_dhcp_reservation` did not return the MAC after `update_dhcp_reservation` succeeded and `create_dhcp_reservation` returned `api.err.MacUsed`. `search_clients` shows alias `karakeep-LXC` at `192.168.30.33`. The UniFi hostname field still said `arr-scratch` at creation time; the guest's own hostname is `karakeep`.
 - `NEXTAUTH_URL` is `https://karakeep.yingson.com`.
-- Homarr tile (HLT-04): app `karakeep` in the Homarr app list pings `http://192.168.30.33:3000/` and links to `https://karakeep.yingson.com`. Since the port 3000 rule, Homarr (CT 103, `192.168.30.107`) is not on the allow list, and a curl from CT 103 to that URL times out. The tile will read down until `192.168.30.107` is added to the nftables set or the tile pings the name. Not fixed in this run.
+- Homarr tile (HLT-04): app `karakeep` in the Homarr app list pings `http://192.168.30.33:3000/` and links to `https://karakeep.yingson.com`. Homarr (CT 103, `192.168.30.107`) is on the port 3000 allow list since 2026-11-01; a curl from CT 103 returns 307.
 - Disk: steady growth is 16 to 18 MB a day. Two package steps added more: +740 MB on 2026-10-23 (the Alloy install) and +673 MB on 2026-10-28 (an `apt` upgrade of 120 packages). `apt clean` and the journal cap removed about 400 MB of waste. Each future package upgrade can add 0.5 to 0.7 GB; the 0.34.1 build needs about 1 GB.
 - Load average and the context switch rate inside this guest are the Proxmox host's numbers (lxcfs passes them through), so they are not a guest health signal. Judge the guest by `/proc/pressure/*` and CPU seconds. Fix is a host change (lxcfs `-l`, WISH-274).
 - Kuma monitor 115 once took 27.9 s on 2026-10-27: that was the AdGuard outage INC-20261027-01, not Karakeep.
