@@ -24,9 +24,9 @@ Process: lab-standards `docs/SERVICE-REVIEW.md` · Run log: lab-standards `servi
 
 | Run | Date | Kind | Counts | File |
 |---|---|---|---|---|
-| 1 | 2026-11-01 | review (read only, nothing changed on any server) | critical 0, high 4, medium 20, low 43 (67 total) | [2026-11-01-service-review.md](2026-11-01-service-review.md) |
+| 1 | 2026-11-01 | review (read only, nothing changed on any server) | critical 0, high 3, medium 21, low 43 (67 total) | [2026-11-01-service-review.md](2026-11-01-service-review.md) |
 
-Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from another session, used as leads only), lab-standards `45dc495`. Every finding is `new`. IDs are never reused. Severity rulings by the coordinator are applied: BAK-01 high, BAK-02 medium, PAT-02 medium.
+Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from another session, used as leads only), lab-standards `45dc495`. Every finding is `new`. IDs are never reused. Severity rulings by the coordinator are applied: BAK-01 high, BAK-02 medium, PAT-02 medium, DOC-01 medium.
 
 ## Open findings
 
@@ -34,7 +34,6 @@ Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from an
 |---|---|---|---|---|---|---|---|---|---|
 | BAK-01 | high | Karakeep has no logical backup and no written protect list; PBS is the only copy | Gate 7 | jason | L | remediate | Yes | verified | new |
 | MON-01 | high | Nothing alerts if the workers, Meilisearch or the browser stop | LAB-STANDARDS §7 | chief | S | remediate | No | verified | new |
-| DOC-01 | high | HEAD of the karakeep repo says tagging uses Ollama CT 112; live uses OpenRouter | SERVICE-REVIEW H | jason | S | none | Yes | verified | new |
 | USE-03 | high | No logical backup (export) of the library | none | chief | M | remediate | No | verified | new |
 | SEC-01 | medium | Root SSH login is enabled | LAB-STANDARDS §9 | jason | S | remediate | Yes | verified | new |
 | SEC-02 | medium | Root password may exist and SSH password login is on by default | LAB-STANDARDS §9 | jason | S | remediate | Yes | unverified | new |
@@ -48,6 +47,7 @@ Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from an
 | SPD-05 | medium | BASELINES.md has no measured numbers (Gate 8 open) | Gate 8 | lane A | S | none | No | verified | new |
 | INT-01 | medium | OpenRouter is a live dependency that no lab table declares; bookmark content already leaves the lab for tagging | SERVICE-REVIEW D | jason | S | none | Yes | unverified | new |
 | MON-05 | medium | Full bookmark URLs, some from sign-in sessions, are shipped to Loki | none | jason | M | remediate | Yes | verified | new |
+| DOC-01 | medium | HEAD of the karakeep repo says tagging uses Ollama CT 112; live uses OpenRouter | SERVICE-REVIEW H | jason | S | none | Yes | verified | new |
 | DOC-02 | medium | lab-standards and Command Center data still say tagging calls Ollama; no OpenRouter dependency | SERVICE-REVIEW H | chief | S | none | No | verified | new |
 | DOC-04 | medium | Working tree contradicts itself on the curated tag count (26 or 25) | SERVICE-REVIEW H | jason | S | none | Yes | unverified | new |
 | DOC-07 | medium | Credential and vault references miss the OpenRouter key and the Hermes credential | SERVICE-REVIEW H | jason | S | none | Yes | unverified | new |
@@ -531,9 +531,9 @@ Category MON · Severity medium · State new
 
 ### DOC-01. HEAD of the karakeep repo says tagging uses Ollama CT 112; live uses OpenRouter
 
-Category DOC · Severity high · State new
+Category DOC · Severity medium · State new
 
-- Standard: SERVICE-REVIEW H · Owner: jason, then lane A · Severity: high · Effort: S · Approval: none
+- Standard: SERVICE-REVIEW H · Owner: jason, then lane A · Severity: medium (coordinator ruling 2026-11-01; lane U rated it high) · Effort: S · Approval: none
 - Evidence: `git show HEAD:ARCHITECTURE.md` lines 110, 118; Loki 7 day: 316 openrouter lines, 0 lines with 11434 (D0)
 - Checked: verified (Loki log lines; the configured values in the root-only env file would verify directly)
 - Your call: Yes: who commits the 7 working tree files
@@ -683,14 +683,15 @@ Category DOC · Severity low · State new
 Category DOC · Severity low · State new
 
 - Standard: none · Owner: chief · Severity: low · Effort: S · Approval: none
-- Evidence: `ssh karakeep free -m`: swap 470 of 512 MB; WISH-186; LxcSwapFull fired 2026-10-28
+- Evidence: `ssh karakeep free -m`: swap 470 of 512 MB; WISH-186; LxcSwapFull active since 2026-10-29T11:36Z (Alertmanager)
 - Checked: verified
 - Your call: no
 - Fix: Add one Known Issues line pointing to WISH-186. Undo: git revert
 - Links: WISH-186
 - State: new
-- Detail: Live `free -m`: swap 470 of 512 MB, memory 802 of 4096 MB used. `LxcSwapFull` fired for CT 136 on 2026-10-28 (WISH-186). `ARCHITECTURE.md` §14 Known Issues does not mention it. Fix: one line pointing to WISH-186.
-- Cross-links (lane A): HLT-01, SPD-01
+- Detail: Live `free -m`: swap 470 of 512 MB, memory 802 of 4096 MB used. `LxcSwapFull` active for CT 136 since 2026-10-29T11:36Z (Alertmanager) (WISH-186). `ARCHITECTURE.md` §14 Known Issues does not mention it. Fix: one line pointing to WISH-186.
+- Date note (lane A): lane U's part said LxcSwapFull fired 2026-10-28; Alertmanager shows active since 2026-10-29T11:36Z (P, N and the coordinator agree). 2026-10-28 is when WISH-186 first saw 97 percent.
+- Cross-links (lane A): HLT-01, SPD-01; lane U's part said LxcSwapFull fired 2026-10-28, corrected to 2026-10-29T11:36Z from Alertmanager
 
 ### DOC-13. Working tree leftovers: TROUBLESHOOTING names the Ollama variable; same day changelog entries have no times
 

@@ -6,7 +6,7 @@ last_edited_by: Claude Code
 last_edited_date: 2026-11-01
 audience: internal
 tags: [yingson-labs, karakeep, service-review, findings]
-summary: "Service Review run 1 for karakeep (CT 136), review only: 67 findings (high 4, medium 20, low 43). Checklist, scorecard, wishlist verdicts, sprint plan and questions for Jason."
+summary: "Service Review run 1 for karakeep (CT 136), review only: 67 findings (high 3, medium 21, low 43). Checklist, scorecard, wishlist verdicts, sprint plan and questions for Jason."
 doc_type: reference
 scope: service
 service_name: karakeep
@@ -38,17 +38,17 @@ Page: PENDING. Review run, read only. Nothing was changed on any server. The fin
 
 ## Result
 
-**67 findings:** critical 0, high 4, medium 20, low 43. 23 are `unverified` in their Checked field. Readiness supported by the live checks: **R3** (the inventory says R3, no conflict). Connected level: **C1**.
+**67 findings:** critical 0, high 3, medium 21, low 43. 23 are `unverified` in their Checked field. Readiness supported by the live checks: **R3** (the inventory says R3, no conflict). Connected level: **C1**.
 
 | Lane | Findings | Critical | High | Medium | Low |
 |---|---|---|---|---|---|
 | S (SEC) | 12 | 0 | 0 | 3 | 9 |
 | P (PAT, BAK, HLT) | 15 | 0 | 1 | 6 | 8 |
 | N (SPD, INT, MON) | 14 | 0 | 1 | 3 | 10 |
-| U (DOC, USE, CC) | 26 | 0 | 2 | 8 | 16 |
-| **Total** | 67 | 0 | 4 | 20 | 43 |
+| U (DOC, USE, CC) | 26 | 0 | 1 | 9 | 16 |
+| **Total** | 67 | 0 | 3 | 21 | 43 |
 
-Highs: BAK-01 (no logical backup, PBS is the only copy, never restored), MON-01 (nothing alerts if the workers, Meilisearch or the browser stop), DOC-01 (repo HEAD docs name Ollama, live tagging is OpenRouter), USE-03 (same fact as BAK-01).
+Highs: BAK-01 (no logical backup, PBS is the only copy, never restored), MON-01 (nothing alerts if the workers, Meilisearch or the browser stop), USE-03 (same fact as BAK-01). DOC-01 was ruled medium by the coordinator because a docs-only drift meets no Step 5 high trigger (lane U rated it high).
 
 Top 5 to look at first: BAK-01, MON-01, INT-01 (page text goes to OpenRouter and on to Google, and no lab table says so), MON-05 (full bookmark URLs, some from sign-in sessions, are in Loki), PAT-02 with PAT-01 (browser security updates pending, two releases behind). SEC-01 and SEC-02 (root SSH login in the config, WISH-236) are next.
 
@@ -61,10 +61,10 @@ Each pair below keeps both IDs and is cross-linked in Links. Lane A did not chan
 | BAK-01 / USE-03 | Same fact (no logical backup). Both high. Owners differ (jason versus chief), effort differs (L versus M). Treat as one fix. |
 | USE-01 / CC-03 | Same evidence (`/api/metrics` returns 401, no `karakeep*` series). Both medium. |
 | USE-06 / CC-07 | Slug tags as join keys, and the Command Center read that needs them. Both low. |
-| HLT-01 / SPD-01 / DOC-12 | Swap near full. HLT-01 is the alert, SPD-01 the sizing view, DOC-12 the missing doc line. All low. Date conflict: P and N say `LxcSwapFull` has been active since 2026-10-29T11:36Z (Alertmanager); U's DOC-12 says it fired 2026-10-28, which is the day WISH-186 first saw 97 percent. Alertmanager is the live source. |
+| HLT-01 / SPD-01 / DOC-12 | Swap near full. HLT-01 is the alert, SPD-01 the sizing view, DOC-12 the missing doc line. All low. Date conflict: P and N say `LxcSwapFull` has been active since 2026-10-29T11:36Z (Alertmanager); U's DOC-12 said 2026-10-28 (the day WISH-186 first saw 97 percent); DOC-12 now reads 2026-10-29T11:36Z, confirmed by the coordinator. |
 | HLT-02 / SPD-05 | Both are the empty BASELINES.md, same fix, same medium. |
 | HLT-05 / SPD-02 | Same load average reading, cause unverified in both. P left it to N. |
-| DOC-02 / INT-01 / INT-03 / CC-06 / DOC-01 | The Ollama versus OpenRouter drift seen from five sides. Severities differ by design: DOC-01 high, INT-01 medium (the privacy decision), DOC-02 medium, INT-03 low, CC-06 medium. DOC-01 is a docs-only finding rated high; the Step 5 high definition (exposed service missing a fix, backup gap, failure that would not alert) does not obviously cover it. Raised for Jason or the coordinator. |
+| DOC-02 / INT-01 / INT-03 / CC-06 / DOC-01 | The Ollama versus OpenRouter drift seen from five sides. Severities differ by design: DOC-01 medium (ruled down from high by the coordinator), INT-01 medium (the privacy decision), DOC-02 medium, INT-03 low, CC-06 medium. DOC-01 was rated high by U; the coordinator ruled it medium because a docs-only drift meets no Step 5 high trigger. |
 | SEC-08 / BAK-05 / DOC-07 / USE-05 | One Dashlane question rated four ways (low, medium, medium, low). Jason's one answer closes all four. |
 | PAT-05 / DOC-08 | Same missing LAB-STANDARDS section 12 upgrade backlog row. |
 | BAK-04 and scanopy lab-standards/MON-01 | BAK-04 (no Prometheus rule for stale PBS backups) is the same gap already open as `lab-standards/MON-01` in scanopy's FINDINGS.md. Listed once lab-wide by P; kept here under its own ID. |
@@ -197,6 +197,6 @@ Sprint note: CC-01, CC-02, CC-04, CC-05 and CC-07 carry approval `none` in lane 
 
 ## Run record
 
-One line for `lab-standards/service-reviews/review-log.jsonl` is returned to the coordinator (lane A does not write lab-standards). Counts: critical 0, high 4, medium 20, low 43; new 67; fixed 0; regressed 0; unverified 23; standards match 38, no 35, unverified 27.
+One line for `lab-standards/service-reviews/review-log.jsonl` is returned to the coordinator (lane A does not write lab-standards). Counts: critical 0, high 3, medium 21, low 43; new 67; fixed 0; regressed 0; unverified 23; standards match 38, no 35, unverified 27.
 
 Review only. Nothing was changed on any server. Reply with the IDs or sprints you approve.
