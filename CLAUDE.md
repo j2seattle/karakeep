@@ -32,11 +32,11 @@ last_verified: 2026-11-01
 | Field | Value |
 |---|---|
 | **Last reconciled** | 2026-11-01 |
-| **lab-standards commit** | `3827b40` |
+| **lab-standards commit** | `c245028` |
 | **Reconciled by** | Claude Code (fix run) |
 | **Open items flowing up** | Gate 7 restore. Read-only Cursor wrapper. OpenRouter dependency edges and `TOOLS.yaml` `lab_use` (returned to the coordinator, 2026-11-01). |
 
-At session start: `git -C ../lab-standards log -1 --format=%h`. If the SHA moved past `3827b40`, read `lab-standards/CHANGELOG.md` since that commit before changing this service.
+At session start: `git -C ../lab-standards log -1 --format=%h`. If the SHA moved past `c245028`, read `lab-standards/CHANGELOG.md` since that commit before changing this service.
 
 ## Read order
 

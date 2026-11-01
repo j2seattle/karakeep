@@ -32,8 +32,8 @@ Every value here was observed on 2026-11-01 (Service Review run 1 and the fix ru
 | Field | Value |
 |---|---|
 | **Host** | CT 136, 2 vCPU / 4 GB RAM / 15 GB disk |
-| **App version** | 0.33.2 (`curl http://192.168.30.33:3000/api/version`) |
-| **Typical load** | Idle archive. 7 day CPU mean 1.5 percent, peak 88 percent (Prometheus). Load average 4.7 to 5.9 on 2 vCPU while CPU pressure is about 0.1 (cause not found, see Notes). |
+| **App version** | 0.33.2 (`curl https://karakeep.yingson.com/api/version`) |
+| **Typical load** | Idle archive. 7 day CPU mean 1.5 percent, peak 88 percent (Prometheus). Load average 4.7 to 5.9 on 2 vCPU is the Proxmox host's number, not this guest's (see Notes). |
 | **Measured over** | One window on 2026-11-01 (laptop on the LAN, 5 runs each), plus 7 day Prometheus queries |
 
 ## Health endpoint
@@ -42,8 +42,8 @@ Every value here was observed on 2026-11-01 (Service Review run 1 and the fix ru
 - **Warning threshold (proposed):** a 200 that takes over 1 second on the IP path more than once in 5 runs, or any non-200.
 - **Critical threshold (proposed):** no 200 from `/api/health` for 2 minutes (Kuma monitors 115 and 116 already alert on that). A 200 does not prove the workers or Meilisearch are up, so also check the four units with `systemctl is-active` (see Notes).
 - **Measurement source:** `curl -s -o /dev/null -w '%{http_code} %{time_total}
-' http://192.168.30.33:3000/api/health` from the laptop, five runs. The body is the fixed text `{"status":"ok","message":"Web app is working"}`.
-- **Known false-positive conditions:** the first request after idle can take about 1 second (seen once in each of two runs on 2026-11-01). Kuma monitor 115 (name path) logged one 27.9 s response in 7 days, cause not found, while the IP path stayed fast.
+' https://karakeep.yingson.com/api/health` from the laptop, five runs (the IP path was measured before the 2026-11-01 firewall rule; from the guest use `http://127.0.0.1:3000/api/health`). The body is the fixed text `{"status":"ok","message":"Web app is working"}`.
+- **Known false-positive conditions:** the first request after idle can take about 1 second (seen once in each of two runs on 2026-11-01). Kuma monitor 115 (name path) logged one 27.9 s response on 2026-10-27 during the AdGuard outage INC-20261027-01, while the IP path stayed fast.
 - **Last verified:** 2026-11-01
 
 ## Resource ranges
@@ -52,13 +52,15 @@ Every value here was observed on 2026-11-01 (Service Review run 1 and the fix ru
 |---|---|---|---|
 | CPU | 7 day mean 1.5 percent. CPU pressure (some, avg300) 0.11. Idle 80 to 90 percent in `vmstat` | proposed: pressure avg300 above 10 for 15 minutes | proposed: above 50 for 15 minutes |
 | RAM | 815 MiB used, 3280 MiB available of 4096 MiB. 7 day minimum available 3.24 GiB. Memory pressure 0.00 | proposed: available under 1 GiB | proposed: available under 400 MiB, or any memory pressure above 5 |
-| Disk | `/` 59 percent (8.2 GiB of 15 GiB), growing about 110 MB a day | 85 percent for 15 minutes (`GuestRootDiskHigh`, existing rule). About 40 days at the current rate | proposed: 95 percent |
+| Disk | `/` 59 percent (8.2 GiB of 15 GiB), growing 16 to 18 MB a day (see Notes) | 85 percent for 15 minutes (`GuestRootDiskHigh`, existing rule). About 280 days away at the steady rate | proposed: 95 percent |
 | Swap | 468 of 512 MiB used (about 91 percent), stable for 7 days with swap-in near zero. Cold pages, not pressure | `GuestSwapHigh` (swap-in above 50 pages/s, existing rule) | proposed: swap-in above 50 pages/s together with memory pressure above 5 |
 
 ## Notes
 
-- Swap sits at about 90 percent with memory pressure at 0.00. This is cold pages parked in swap. `LxcSwapFull` has fired for CT 136 since 2026-10-29 (WISH-186).
-- Load average reads high for the CPU use, and the context switch rate is near 85 thousand a second. The cause is not found (finding SPD-02). Do not use load average as a threshold.
+- Swap sat at about 91 percent with memory pressure at 0.00 (292 of 512 MiB later the same day). This is mostly cold pages parked in swap, with short swap-in bursts (peak 242 pages a second in a 10 minute window). `LxcSwapFull` has fired for CT 136 since 2026-10-29 (WISH-186).
+- Load average and context switch counts inside this LXC guest are the Proxmox host's numbers (lxcfs passes them through), so they say nothing about the guest. Use pressure and CPU seconds.
+- Disk growth: steady 16 to 18 MB a day, plus package steps of +740 MB (2026-10-23, Alloy install) and +673 MB (2026-10-28, apt upgrade of 120 packages). The earlier figure of 110 MB a day included that step. The 85 percent alert is about 280 days away at the steady rate and 45 to 60 days away if a big upgrade lands every month.
+- Load average is not a threshold here (SPD-02, explained above).
 - IO pressure (some, avg300) is 0.30 and full 0.24, the highest of the three, still low.
 - The disk is the tightest resource. Growth is from page copies, screenshots and Meilisearch. `/opt/karakeep_data` is root only, so the split is not measured.
 - Memory peaked at 4.0 GiB used in the 7 day window once, so a spike can still push the guest into swap.

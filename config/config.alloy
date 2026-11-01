@@ -1,0 +1,82 @@
+// Ships the systemd journal to Loki on CT 138. For guests without Docker.
+// Installed from the Grafana apt repository. Lives at /etc/alloy/config.alloy.
+// Labels: service (lab slug), host (guest hostname), unit, level, source.
+// Same label shape as config.alloy. Optional file logs go in a second file in
+// /etc/alloy/ (see files-*.alloy); Alloy loads every .alloy file in that folder.
+
+logging {
+  level = "warn"
+}
+
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+}
+
+loki.source.journal "journal" {
+  max_age       = "12h"
+  relabel_rules = loki.relabel.journal.rules
+  labels        = { source = "journal" }
+  forward_to    = [loki.process.redact.receiver]
+}
+
+// MON-05 (2026-11-01): karakeep-web logs bookmarks.checkUrl requests that carry a full
+// bookmark URL, some with session tokens. Drop the query string before shipping.
+loki.process "redact" {
+  // MON-04 (2026-11-01): count error lines as metrics. Labels are the journal labels only (service,
+  // host, unit, source), never the line text, so no URL reaches a metric. Alloy exposes them as
+  // loki_process_custom_<name> and metrics.alloy pushes them to Prometheus.
+  stage.match {
+    selector = "{unit=\"karakeep-web.service\"} |= \"uncaughtException\""
+
+    stage.metrics {
+      metric.counter {
+        name              = "karakeep_log_uncaught_exceptions_total"
+        description       = "uncaughtException lines in the karakeep-web journal"
+        action            = "inc"
+        match_all         = true
+        max_idle_duration = "168h"
+      }
+    }
+  }
+
+  stage.match {
+    selector = "{unit=~\"karakeep-web.service|karakeep-workers.service|meilisearch.service\"} |~ \"(?i)(error|exception|fatal)\""
+
+    stage.metrics {
+      metric.counter {
+        name              = "karakeep_log_error_lines_total"
+        description       = "error, exception or fatal lines in the karakeep web, workers and meilisearch journals"
+        action            = "inc"
+        match_all         = true
+        max_idle_duration = "168h"
+      }
+    }
+  }
+
+  stage.replace {
+    expression = "bookmarks\\.checkUrl\\?(\\S+)"
+    replace    = "<redacted>"
+  }
+  forward_to = [loki.write.lab.receiver]
+}
+
+loki.write "lab" {
+  endpoint {
+    url = sys.env("LOKI_URL")
+  }
+
+  external_labels = {
+    service = sys.env("ALLOY_SERVICE"),
+    host    = sys.env("ALLOY_HOST"),
+  }
+}

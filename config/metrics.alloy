@@ -1,0 +1,111 @@
+// Telemetry for commandcenter (Lane U pilot, YIN-114, 2026-10-26).
+// Host or guest metrics plus Alloy's own metrics, pushed to Prometheus on CT 133 by remote write.
+// Nothing listens on the network: the push goes out, no port is opened on the guest.
+//
+// Same labels as the logs: host (guest name as Proxmox shows it) and service (lab slug),
+// from ALLOY_HOST and ALLOY_SERVICE. These match pve_guest_info `name` and the Kuma labels.
+//
+// Apt guests and the Proxmox host: /etc/alloy/metrics.alloy, paths left at their defaults.
+// Docker guests: mounted next to config.alloy in /etc/alloy, with ALLOY_ROOTFS=/rootfs,
+// ALLOY_PROCFS=/host/proc and ALLOY_SYSFS=/host/sys set in docker-compose.yml.
+// Pending updates come from the textfile folder (scripts/telemetry-apt.sh writes it).
+
+prometheus.exporter.unix "node" {
+  rootfs_path = coalesce(sys.env("ALLOY_ROOTFS"), "/")
+  procfs_path = coalesce(sys.env("ALLOY_PROCFS"), "/proc")
+  sysfs_path  = coalesce(sys.env("ALLOY_SYSFS"), "/sys")
+
+  // Hardware collectors make no sense in a container and only add series.
+  disable_collectors = ["arp", "bcache", "bonding", "btrfs", "cpufreq", "dmi", "edac", "fibrechannel", "hwmon", "infiniband", "ipvs", "mdadm", "nfsd", "nvme", "powersupplyclass", "rapl", "tapestats", "thermal_zone", "udp_queues", "xfs"]
+  enable_collectors  = ["systemd"]
+
+  systemd {
+    unit_include    = ".+\\.service"
+    enable_restarts = true
+  }
+
+  filesystem {
+    fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tmpfs|tracefs|fuse\\.lxcfs|ramfs)$"
+    mount_points_exclude = "^/(dev|proc|run|sys|var/lib/docker/.+|etc/(hosts|hostname|resolv\\.conf))($|/)"
+  }
+
+  textfile {
+    directory = coalesce(sys.env("ALLOY_TEXTFILE_DIR"), "/var/lib/yingson-telemetry")
+  }
+}
+
+prometheus.scrape "node" {
+  targets         = prometheus.exporter.unix.node.targets
+  scrape_interval = "30s"
+  forward_to      = [prometheus.relabel.node.receiver]
+}
+
+prometheus.relabel "node" {
+  forward_to = [prometheus.remote_write.commandcenter.receiver]
+
+  // instance is the guest name, not the Alloy container id.
+  rule {
+    target_label = "instance"
+    replacement  = sys.env("ALLOY_HOST")
+  }
+
+  // A container guest sees every disk of the Proxmox host in /proc/diskstats, so the default
+  // drops node_disk_*; pve_disk_* already has each guest's disk IO. The Proxmox host sets
+  // ALLOY_DROP_METRICS="^$" to keep them. Docker guests also drop the interface counters,
+  // because on the compose bridge network they describe the Alloy container, not the guest.
+  rule {
+    source_labels = ["__name__"]
+    regex         = coalesce(sys.env("ALLOY_DROP_METRICS"), "node_disk_.+")
+    action        = "drop"
+  }
+}
+
+// Alloy's own cost and health: CPU, memory, build version, and whether the push is keeping up.
+prometheus.exporter.self "alloy" { }
+
+prometheus.scrape "alloy" {
+  targets         = prometheus.exporter.self.alloy.targets
+  scrape_interval = "60s"
+  forward_to      = [prometheus.relabel.alloy.receiver]
+}
+
+prometheus.relabel "alloy" {
+  forward_to = [prometheus.remote_write.commandcenter.receiver]
+
+  rule {
+    target_label = "instance"
+    replacement  = sys.env("ALLOY_HOST")
+  }
+
+  rule {
+    source_labels = ["__name__"]
+    regex         = "alloy_build_info|process_cpu_seconds_total|process_resident_memory_bytes|go_memstats_heap_inuse_bytes|prometheus_remote_storage_(samples_total|samples_failed_total|samples_pending|highest_timestamp_in_seconds|queue_highest_timestamp_seconds)|loki_write_(sent_entries_total|dropped_entries_total)|loki_process_custom_karakeep_log_.+"
+    action        = "keep"
+  }
+
+  // loki.write metrics carry the Loki address in `host`. Move it to `endpoint` so `host` stays
+  // the guest name (remote write adds host only where the label is empty).
+  rule {
+    source_labels = ["__name__", "host"]
+    regex         = "loki_write_.+;(.+)"
+    target_label  = "endpoint"
+  }
+
+  rule {
+    source_labels = ["__name__"]
+    regex         = "loki_write_.+"
+    target_label  = "host"
+    replacement   = ""
+  }
+}
+
+prometheus.remote_write "commandcenter" {
+  endpoint {
+    url = coalesce(sys.env("PROM_REMOTE_WRITE_URL"), "http://192.168.30.62:9090/api/v1/write")
+  }
+
+  external_labels = {
+    service = sys.env("ALLOY_SERVICE"),
+    host    = sys.env("ALLOY_HOST"),
+  }
+}

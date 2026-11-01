@@ -74,7 +74,7 @@ Resources are the helper script's tested size, not the lab default of 2 GB / 8 G
 | Path | Target |
 |---|---|
 | LAN name | `https://karakeep.yingson.com` (NPM host 53 → `192.168.30.33:3000`) |
-| Direct | `http://192.168.30.33:3000` |
+| Direct | `http://192.168.30.33:3000`, but only these sources are let in (nftables on the guest, 2026-11-01): the guest itself, NPM `.182`, Kuma `.130`, Prometheus `.62`, Command Center `.94` and Scanopy `.25`. The laptop is not let in. Use the name, or `ssh karakeep` and then `127.0.0.1:3000`. Homarr (`.107`) is not on the list (see section 14). |
 | Off-LAN | Tailscale to the LAN name. No Cloudflare hostname. Jason confirmed that on 2026-10-08. |
 | UniFi | alias `karakeep-LXC`, fixed IP `192.168.30.33`, MAC `bc:24:11:bc:f5:e7` |
 
@@ -186,7 +186,11 @@ Updates later use the same script's update path inside the guest, or `update` fr
 
 The nightly PBS job includes every guest. The first snapshot of this guest is `ct/136/2026-10-08T17:30:26Z` (finished successfully, 2026-10-08). A restore has not been tested. That keeps the service off R4.
 
-There is no separate database dump. The SQLite file is inside the guest disk, so a PBS snapshot of CT 136 is the backup. Restoring the guest restores the bookmarks.
+Two copies exist. PBS snapshots the whole guest nightly, but a snapshot of a running SQLite is crash-consistent, and the PBS store is on the NAS with the live data. The second copy is a logical backup through Kopia (client `karakeep@ct136`, server CT 135), run by `kopia-backup-karakeep.timer` at 05:00 Pacific. The script (`scripts/kopia-backup-karakeep.sh`) copies `db.db` with the SQLite online backup API and checks it, then saves that copy plus `/etc/karakeep` (which holds secrets, so the Kopia repository is the protected place for it) and the assets folder. `queue.db` and Meilisearch are not saved: the queue is work in flight and the search index is rebuilt from `db.db`. First clean run 2026-11-01 12:36 PST; Prometheus shows `kopia:source_snapshot_age:seconds` for both sources and the lab-wide `KopiaSourceStale` rule covers them. Enrolment script: `scripts/enroll-karakeep-kopia.sh`.
+
+**Protect list** (what a rebuild needs): the SQLite database (`/opt/karakeep_data/db.db`), the assets (`/opt/karakeep_data/assets`), and `/etc/karakeep/karakeep.env`. Not saved by design: `queue.db`, `/var/lib/meilisearch`, `/opt/karakeep` (rebuilt by the community script).
+
+**Restore.** The PBS restore to a scratch CT was tested on 2026-11-01 (BAK-02): backup `ct/136/2026-11-01T10:18:40Z` restored to CT 197 with no network, four units active, health and sign-in 200, SQLite integrity ok, 947 bookmarks, then destroyed. Steps are in [docs/RUNBOOK.md](docs/RUNBOOK.md). The Kopia copy has not been restored yet. A scratch restore is not R4 on its own. Per-snapshot PBS verify state can be read with `pvesh get /nodes/proxmox/storage/pbs-backups/content --vmid 136`. A manual snapshot `pre_karakeep_fix_20261101_exp20261115` was taken before the fix run.
 
 ## 11. Monitoring & Health
 
@@ -198,6 +202,10 @@ There is no separate database dump. The SQLite file is inside the guest disk, so
 **Good check.** `/api/health` returns 200 with a fixed body and does not prove the workers or search work. Run `systemctl is-active karakeep-web karakeep-workers karakeep-browser meilisearch` and expect four lines of `active` (all four were active on 2026-11-01), plus a 200 from `/signin`.
 
 Both returned `200 - OK` at 2026-10-08 17:31 UTC. Notification id 1 (Yingson Labs Discord `#alerts`). Jason confirmed the down and the up the same day.
+
+**Alerts (2026-11-01).** Prometheus rules `KarakeepUnitNotActive` and `KarakeepUnitMetricMissing` (any of the four units not active for 5 minutes), `KarakeepUnitRestarting`, `KarakeepSlowResponse` and `KarakeepFlapping` (monitor 115 or 116), and the lab-wide `PbsBackupStale` and `PbsGuestHasNoBackup` (36 hours) route through Alertmanager to Discord `#alerts`. Prometheus scrapes `http://192.168.30.33:3000/api/metrics` as job `karakeep` with a bearer token kept in a file on the Prometheus host (not in git). A textfile metric from `scripts/karakeep-health-textfile.sh` (cron every 5 minutes, root) gives `karakeep_bookmarks_total`, `karakeep_health_probe_success`, `karakeep_last_crawl_timestamp_seconds` and `karakeep_queue_oldest_pending_timestamp_seconds` through the Alloy textfile collector. An alert on error text in Loki is not possible yet because the Loki ruler is not set up (WISH-270).
+
+**Live Alloy config.** CT 136 runs Alloy 1.21.3 (the hold was lifted on 2026-11-01). `/etc/alloy/config.alloy` drops the query string of `checkUrl` request lines before shipping (MON-05), so new lines hold no session tokens; older lines age out of Loki by about 2027-01-30. `/etc/alloy/metrics.alloy` holds the metrics side. Copies with no secrets (scanned) are in [config/](config/). Backups on the guest: `/etc/alloy/*.bak-20261101*`. Edit the guest file first, then refresh the copy here.
 
 Logs go to Loki (CT 138) through Grafana Alloy, installed 2026-10-23 on CT 136: the apt package held at 1.21.2 ships the journal. Labels `host=karakeep` and `service=karakeep`. Query them in Grafana Explore (Loki data source). Rollout record: `docs/ALLOY-ROLLOUT.md` in the loki repo. The Proxmox exporter (Prometheus job `pve`) records CPU, memory, disk and network for every guest, and the Grafana dashboards "Lab overview (test)" and "Service view (test)" (folder Command Center) show each one. Uptime Kuma monitors are also scraped by Prometheus (job `uptime-kuma`) with `host` and `service` labels.
 
@@ -216,9 +224,11 @@ Deleting bookmarks or `/opt/karakeep_data` is destructive. No token will be issu
 
 ## 13. Security
 
-Unprivileged container. Chromium is bound to localhost and started with `--no-sandbox` because it runs as root inside the container (the helper script's unit). It is not reachable off the guest.
+Unprivileged container (`unprivileged: 1`, `nesting=1,keyctl=1`, `onboot: 1`, read with `pct config 136` on 2026-11-01). The three karakeep units and Meilisearch run as root inside it. Chromium is bound to localhost and started with `--no-sandbox` because it runs as root. A plan to run the units as a normal user is in the director-worker run folder (`parts/sec03-plan.md`, SEC-03) and waits for the 0.34.1 upgrade.
 
-The web UI is the only published port. Meilisearch and the browser debug port stay on localhost.
+Hardening done on 2026-11-01: new user sign-up is off (`DISABLE_SIGNUPS` is set in the env file). Root SSH login is key only (`PermitRootLogin without-password`, password login off, root password locked), set by a drop-in under `/etc/ssh/sshd_config.d/`. `avahi-daemon` and `postfix` are stopped and disabled. Port 3000 only accepts the sources in section 3 (nftables, `/etc/nftables.conf`; dropped attempts are logged with the prefix `kk3000-drop`). Unattended security updates are on (`20auto-upgrades`, `50unattended-upgrades`, Debian and Debian-Security origins). Updating Chromium does not restart `karakeep-browser`, so the running browser keeps the old build until that unit is restarted. The journal is capped at 100M and apt no longer keeps downloaded packages (`99no-keep-debs`).
+
+Listeners on 2026-11-01 (`ss -tlnup` as root): tcp 3000 `next-server` (all addresses), tcp 22 `sshd`, tcp 127.0.0.1:7700 `meilisearch`, 127.0.0.1:9222 `chromium`, 127.0.0.1:12345 `alloy` (its own HTTP port), 127.0.0.1:35883 `node dist/index.js` (the workers). No UDP listeners. The web UI is the only published port.
 
 No Cloudflare hostname. Jason decided Tailscale only on 2026-10-08.
 
@@ -227,6 +237,10 @@ No Cloudflare hostname. Jason decided Tailscale only on 2026-10-08.
 - The install log on the Proxmox host is `/var/log/karakeep-ct-create.log`.
 - `get_dhcp_reservation` did not return the MAC after `update_dhcp_reservation` succeeded and `create_dhcp_reservation` returned `api.err.MacUsed`. `search_clients` shows alias `karakeep-LXC` at `192.168.30.33`. The UniFi hostname field still said `arr-scratch` at creation time; the guest's own hostname is `karakeep`.
 - `NEXTAUTH_URL` is `https://karakeep.yingson.com`.
+- Homarr tile (HLT-04): app `karakeep` in the Homarr app list pings `http://192.168.30.33:3000/` and links to `https://karakeep.yingson.com`. Since the port 3000 rule, Homarr (CT 103, `192.168.30.107`) is not on the allow list, and a curl from CT 103 to that URL times out. The tile will read down until `192.168.30.107` is added to the nftables set or the tile pings the name. Not fixed in this run.
+- Disk: steady growth is 16 to 18 MB a day. Two package steps added more: +740 MB on 2026-10-23 (the Alloy install) and +673 MB on 2026-10-28 (an `apt` upgrade of 120 packages). `apt clean` and the journal cap removed about 400 MB of waste. Each future package upgrade can add 0.5 to 0.7 GB; the 0.34.1 build needs about 1 GB.
+- Load average and the context switch rate inside this guest are the Proxmox host's numbers (lxcfs passes them through), so they are not a guest health signal. Judge the guest by `/proc/pressure/*` and CPU seconds. Fix is a host change (lxcfs `-l`, WISH-274).
+- Kuma monitor 115 once took 27.9 s on 2026-10-27: that was the AdGuard outage INC-20261027-01, not Karakeep.
 - Swap is about 91 percent used (468 of 512 MiB on 2026-11-01) with memory pressure at 0.00. It holds cold pages, not live thrash. `LxcSwapFull` has fired for CT 136 since 2026-10-29. See WISH-186 and [BASELINES.md](BASELINES.md).
 - The curated tag count is written as 26 here and as 25 in one changelog entry. Jason has not settled which is right (review finding DOC-04).
 
@@ -237,7 +251,7 @@ Restart, upgrade, and backup commands are in [docs/RUNBOOK.md](docs/RUNBOOK.md).
 ## 16. Open Items & Planned Changes
 
 - A read-only Cursor wrapper, if one is wanted. The official server is not that wrapper.
-- Gate 7 restore is not done. The service is not R4 without it. Gate 8 baselines were measured on 2026-11-01 as one sample ([BASELINES.md](BASELINES.md)).
+- Gate 7: the PBS scratch restore passed (BAK-02) and a Kopia client runs with a schedule and a freshness rule, but the Kopia copy itself has not been restored and the readiness level has not been raised. SEC-03 (non-root units) and the PAT-01 upgrade (staged as `scripts/upgrade-0.34.1.ps1`, Jason runs it) are open. Gate 8 baselines were measured on 2026-11-01 as one sample ([BASELINES.md](BASELINES.md)).
 
 ## Related
 
