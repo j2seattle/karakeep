@@ -2,8 +2,8 @@
 title: Troubleshooting — karakeep
 version: 0.1.0
 status: active
-last_edited_by: Cursor Grok
-last_edited_date: 2026-10-08
+last_edited_by: Claude Code
+last_edited_date: 2026-11-01
 parent: ARCHITECTURE.md
 children: []
 siblings: [BASELINES.md, CHANGELOG.md]
@@ -18,7 +18,7 @@ depends_on: [proxmox, npm, adguard]
 depended_on_by: []
 agent_context: true
 permission_tier: read-only
-last_verified: 2026-10-08
+last_verified: 2026-11-01
 ---
 
 # Troubleshooting — karakeep
@@ -37,7 +37,7 @@ NPM or the certificate. Direct `http://192.168.30.33:3000` bypasses both. If the
 
 ## AI Settings is missing from User Settings
 
-The link is rendered only when the web process sees `OPENAI_API_KEY` or `OLLAMA_BASE_URL`. Those lines live in `/etc/karakeep/karakeep.env` on CT 136, not in the laptop `karakeep.env`. Restart `karakeep-web` after adding them, then open `https://karakeep.yingson.com/settings/ai`. A reload of the old process will not show the page.
+The link is rendered only when the web process sees `OPENAI_API_KEY`. This lab uses `OPENAI_API_KEY` with OpenRouter. Upstream also accepts `OLLAMA_BASE_URL`, which this lab does not set. Those lines live in `/etc/karakeep/karakeep.env` on CT 136, not in the laptop `karakeep.env`. Restart `karakeep-web` after adding them, then open `https://karakeep.yingson.com/settings/ai`. A reload of the old process will not show the page.
 
 ## Workers are down and new bookmarks never archive
 

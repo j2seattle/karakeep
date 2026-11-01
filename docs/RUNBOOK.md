@@ -2,8 +2,8 @@
 title: Runbook — karakeep
 version: 0.1.0
 status: active
-last_edited_by: Cursor Grok
-last_edited_date: 2026-10-08
+last_edited_by: Claude Code
+last_edited_date: 2026-11-01
 parent: ARCHITECTURE.md
 children: []
 siblings: [TROUBLESHOOTING.md, ARCHITECTURE.md]
@@ -18,7 +18,7 @@ depends_on: [proxmox, pbs]
 depended_on_by: []
 agent_context: true
 permission_tier: read-only
-last_verified: 2026-10-08
+last_verified: 2026-11-01
 ---
 
 # Runbook — karakeep
@@ -82,8 +82,12 @@ The script reads `C:\Users\thedu\.cursor\mcps\karakeep.env` and skips ids alread
 
 ## Tagging, rules, and lists
 
-AI Settings is on: auto-tagging, lowercase hyphens, summarization off, Jason's 26 curated tags. Host rules for github, x/twitter, reddit, and youtube run on new bookmarks only. Smart lists **GitHub**, **Tools**, and **Agents** follow those tags. A full retag was queued on 2026-10-08. Re-run it from Admin → Background jobs if a later batch needs the same pass. Favourites, Archive, and highlights are chosen on each card.
+AI Settings: auto-tagging on for new saves, lowercase hyphens, summarization off, Jason's 26 curated tags still selected. Text and image inference use OpenRouter `google/gemini-2.5-flash-lite`. Host rules for github, x/twitter, reddit, and youtube run on new bookmarks only. Smart lists **GitHub**, **Tools**, **Agents**, and **Twitter** (`#x or #twitter`) follow those tags. Eight items were retagged on 2026-10-12, then the rest of the library the same day. 844 bookmarks finished success. Do not run another library-wide retag unless Jason asks. Favourites, Archive, and highlights are chosen on each card.
+
+## Check the version
+
+Read only, no login: `curl -s http://192.168.30.33:3000/api/version` prints the running app version (0.33.2 on 2026-11-01). Compare it with the latest release at `https://github.com/karakeep-app/karakeep/releases`.
 
 ## Upgrade
 
-Use the community-script update path. It stops the three units, pulls the GitHub release, rebuilds on Node 22, migrates the database, and starts the units. Take a PBS snapshot first. Do not switch the guest to Node 24.
+Use the community-script update path. It stops the app units, pulls the GitHub release, rebuilds on Node 22, migrates the database, and starts the units. Take a PBS snapshot first. Do not switch the guest to Node 24.
