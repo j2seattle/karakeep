@@ -25,7 +25,7 @@ Process: lab-standards `docs/SERVICE-REVIEW.md` · Run log: lab-standards `servi
 | Run | Date | Kind | Counts | File |
 |---|---|---|---|---|
 | 1 | 2026-11-01 | review (read only, nothing changed on any server) | critical 0, high 3, medium 21, low 43 (67 total) | [2026-11-01-service-review.md](2026-11-01-service-review.md) |
-| 2 | 2026-11-01 | fix | open: critical 0, high 0, medium 8, low 10 (18 of 67 still open, 49 fixed) | this file |
+| 2 | 2026-11-01 | fix | open: critical 0, high 0, medium 6, low 9 (15 of 67 still open, 52 fixed; PAT-01, SEC-03, SEC-10 closed later on 2026-11-01) | this file |
 
 Fix run 2026-11-01 (docs lane final pass): states below come from lane replies the coordinator checked. Readiness stays R3 (Dashlane copies unconfirmed, no Kopia test restore). Connected level C2. One regression found on the way: the Homarr tile pings the IP and the new port 3000 rule blocks Homarr (see HLT-04).
 
@@ -40,8 +40,8 @@ Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from an
 | USE-03 | high | No logical backup (export) of the library | none | chief | M | remediate | No | verified | fixed (verified) 2026-11-01 |
 | SEC-01 | medium | Root SSH login is enabled | LAB-STANDARDS §9 | jason | S | remediate | Yes | verified | fixed (verified) 2026-11-01 |
 | SEC-02 | medium | Root password may exist and SSH password login is on by default | LAB-STANDARDS §9 | jason | S | remediate | Yes | unverified | fixed (verified) 2026-11-01 |
-| SEC-03 | medium | Karakeep services and the browser run as root | LAB-STANDARDS §9 | jason | L | remediate | Yes | verified | still open: plan at director-worker parts/sec03-plan.md, applies after PAT-01 |
-| PAT-01 | medium | Karakeep is two releases behind upstream, including a security release | LAB-DEC-022 | jason | M | destructive | Yes | verified | still open: staged at scripts/upgrade-0.34.1.ps1, destructive, Jason runs it |
+| SEC-03 | medium | Karakeep services and the browser run as root | LAB-STANDARDS §9 | jason | L | remediate | Yes | verified | fixed (verified) 2026-11-01 |
+| PAT-01 | medium | Karakeep is two releases behind upstream, including a security release | LAB-DEC-022 | jason | M | destructive | Yes | verified | fixed (verified) 2026-11-01 |
 | PAT-02 | medium | Three security updates are pending, two of them for the browser that renders saved pages | SERVICE-REVIEW A | jason | S | remediate | Yes | verified | fixed (verified) 2026-11-01 |
 | BAK-02 | medium | The PBS backup has never been restored, and an upgrade whose rollback depends on it is pending | Gate 7 | jason | M | remediate | Yes | verified | fixed (verified) 2026-11-01 |
 | BAK-04 | medium | No alert fires if the nightly PBS backup of CT 136 (or any guest) goes missing or stale | LAB-DEC-053 | chief | S | remediate | No | verified | fixed (verified) 2026-11-01 |
@@ -65,7 +65,7 @@ Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from an
 | SEC-07 | low | Whether new user sign-up is open is unknown | SERVICE-REVIEW B | jason | S | remediate | Yes | unverified | fixed (verified) 2026-11-01 |
 | SEC-08 | low | No confirmed Dashlane copy for four secrets, and a plaintext root password file on the Proxmox host | LAB-STANDARDS §9 | jason | S | none | Yes | unverified | still open: needs Jason (Dashlane answer) |
 | SEC-09 | low | The Cursor env file also holds the admin user and password | LAB-STANDARDS §9 | jason | S | none | Yes | verified | still open: not approved by Jason |
-| SEC-10 | low | No HSTS or frame protection headers from NPM host 53 | none | jason | S | remediate | No | verified | still open: blocked by an NPM CT 107 reload fault (nginx -s reload starts no new workers); change reverted clean |
+| SEC-10 | low | No HSTS or frame protection headers from NPM host 53 | none | jason | S | remediate | No | verified | fixed (verified) 2026-11-01 |
 | SEC-11 | low | Chromium sandbox flag and unprivileged container are doc claims only | LAB-STANDARDS §9 | jason | S | none | No | unverified | fixed (verified) 2026-11-01 |
 | SEC-12 | low | Listeners with no known owner | SERVICE-REVIEW B | jason | S | none | No | unverified | fixed (verified) 2026-11-01 |
 | PAT-03 | low | No automatic security patching on CT 136 | none | jason | S | remediate | Yes | verified | fixed (verified) 2026-11-01 |
@@ -133,7 +133,7 @@ Category SEC · Severity medium · State fixed (verified) 2026-11-01
 
 ### SEC-03. Karakeep services and the browser run as root
 
-Category SEC · Severity medium · State still open: plan at director-worker parts/sec03-plan.md, applies after PAT-01
+Category SEC · Severity medium · State fixed (verified) 2026-11-01
 
 - Standard: LAB-STANDARDS §9 · Severity: medium · Effort: L · Approval: remediate · Owner: jason · Checked: verified
 - Evidence: `ssh karakeep 'ps -eo pid,user,comm'` shows `node`, `meilisearch`, `chromium` under `root`. The `--no-sandbox` flag and the unprivileged container are split out as SEC-11.
@@ -209,7 +209,7 @@ Category SEC · Severity low · State still open: not approved by Jason
 
 ### SEC-10. No HSTS or frame protection headers from NPM host 53
 
-Category SEC · Severity low · State still open: blocked by an NPM CT 107 reload fault (nginx -s reload starts no new workers); change reverted clean
+Category SEC · Severity low · State fixed (verified) 2026-11-01
 
 - Standard: none · Severity: low · Effort: S · Approval: remediate · Owner: jason · Checked: verified
 - Evidence: `curl -sI https://karakeep.yingson.com/signin` showed `HTTP/1.1 200 OK` and `Server: openresty`, and none of `Strict-Transport-Security`, `X-Frame-Options`, `Content-Security-Policy`, `X-Content-Type-Options` (my grep matched on those names only). Low value for a Tailscale only name.
@@ -239,7 +239,7 @@ Category SEC · Severity low · State fixed (verified) 2026-11-01
 
 ### PAT-01. Karakeep is two releases behind upstream, including a security release
 
-Category PAT · Severity medium · State still open: staged at scripts/upgrade-0.34.1.ps1, destructive, Jason runs it
+Category PAT · Severity medium · State fixed (verified) 2026-11-01
 
 - Category PAT · Standard: LAB-DEC-022 · Owner: jason · Severity: **medium** · Effort: M (restart, migration, backup first) · Checked: verified for versions, **unverified** for whether the Node CVEs reach a native Node 22 install · Approval: destructive (upgrade) · Your call: **Yes.** Upgrade now or wait? The upgrade signs everyone out once, lowercases emails, and its rollback is an untested restore.
 - Evidence: `/api/version` 0.33.2 on the guest; GitHub releases latest v0.34.1 (2026-10-22), notes above. Reachable by LAN and Tailscale only (LAB-STANDARDS section 11), which lowers exposure.

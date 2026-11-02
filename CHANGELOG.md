@@ -29,6 +29,8 @@ All notable changes to **karakeep** are documented here. Prepend only.
 
 ## [Unreleased]
 
+- [OPS] **PAT-01, SEC-03 and SEC-10 closed (2026-11-01).** Jason ran the upgrade to 0.34.1 (Node 24, Meilisearch 1.56.0, bookmarks 953 before and after). The units now run as `karakeep`, Chromium has its sandbox on, and NPM host 53 sends three security headers. SEC-03 caused an outage of about 3 minutes, from about 20:55 to 20:58 PST: the release files were not readable by other users, and the stage test had only checked one file. A throwaway bookmark crawled and was deleted. Findings now 52 of 67 fixed. `no decision`.
+
 - [OPS] **Service Review fix run, docs lane (2026-11-01).** The 2026-10-12 working tree edits were checked against the live guest and committed: the guest env file names `OPENAI_BASE_URL=https://openrouter.ai/api/v1`, `INFERENCE_TEXT_MODEL` and `INFERENCE_IMAGE_MODEL` both `google/gemini-2.5-flash-lite`, and no `OLLAMA_BASE_URL`; the Ollama text in these docs is now history only. Added the privacy note that page text goes to OpenRouter and on to Google, measured `BASELINES.md` (one sample), four units in the health checks, the version check, the swap note, the OpenRouter vault reference (existence in Dashlane not confirmed), and the sync receipt (`3827b40`). The 26 or 25 curated tag count is still open (DOC-04). `no decision`.
 
 - [OPS] **Alloy log shipping recorded (2026-10-24).** CT 136 ships its journal to Loki (CT 138) through Alloy (apt package held at 1.21.2), labels `host=karakeep`, `service=karakeep`. Proxmox exporter and the Grafana lab dashboards also cover CT 136. Docs only. `no decision`.

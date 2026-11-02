@@ -48,7 +48,7 @@ last_verified: 2026-11-01
 
 Karakeep (formerly Hoarder) saves links, page archives, and screenshots. This lab copy is for Jason. No lab service depends on it. The laptop import script and the Cursor key call its API.
 
-The app is Karakeep **0.33.2**, installed by the Proxmox VE community script on 2026-10-08. It is not a Docker Compose stack.
+The app is Karakeep **0.34.1** (upgraded by Jason 2026-11-01, Node 24, Meilisearch 1.56.0), installed by the Proxmox VE community script on 2026-10-08. It is not a Docker Compose stack.
 
 ## 2. Host & Runtime
 
@@ -125,7 +125,7 @@ No request leaves the guest except the page the user asked to archive, the taggi
 
 | Path | What |
 |---|---|
-| `/opt/karakeep` | Application source and build (0.33.2) |
+| `/opt/karakeep` | Application source and build (0.34.1) |
 | `/opt/karakeep_data` | SQLite database, assets, screenshots |
 | `/etc/karakeep/karakeep.env` | Runtime environment. Mode should stay restricted. Contains secrets. |
 | `/etc/systemd/system/karakeep-*.service` | The three units |
@@ -180,7 +180,7 @@ Installed from the host with the community script `ct/karakeep.sh` (unattended, 
 
 Updates later use the same script's update path inside the guest, or `update` from the helper script.
 
-**Version check (read only).** `curl -s http://192.168.30.33:3000/api/version` prints the running app version without a login (0.33.2 on 2026-11-01). Compare it with the latest upstream release (`https://github.com/karakeep-app/karakeep/releases`). Version tracking: the app floats on the community script's update path (no pin), Node is pinned to 22 (v22.23.4 live), Meilisearch is 1.54.3 (live, 2026-11-01), the OS is Debian 13.7, and the apt package `alloy` is held at 1.21.2. Do not switch this guest to Docker Compose without a decision. Node is pinned to 22 because Node 24.19 crashes `better-sqlite3` (upstream issue 2989).
+**Version check (read only).** `curl -s http://192.168.30.33:3000/api/version` prints the running app version without a login (0.34.1 after the upgrade; 0.33.2 on 2026-11-01). Compare it with the latest upstream release (`https://github.com/karakeep-app/karakeep/releases`). Version tracking: the app floats on the community script's update path (no pin), Node is pinned to 22 (v22.23.4 live), Meilisearch is 1.54.3 (live, 2026-11-01), the OS is Debian 13.7, and the apt package `alloy` is held at 1.21.2. Do not switch this guest to Docker Compose without a decision. Node is pinned to 22 because Node 24.19 crashes `better-sqlite3` (upstream issue 2989).
 
 ## 10. Backup & Recovery
 
@@ -224,9 +224,9 @@ Deleting bookmarks or `/opt/karakeep_data` is destructive. No token will be issu
 
 ## 13. Security
 
-Unprivileged container (`unprivileged: 1`, `nesting=1,keyctl=1`, `onboot: 1`, read with `pct config 136` on 2026-11-01). The three karakeep units and Meilisearch run as root inside it. Chromium is bound to localhost and started with `--no-sandbox` because it runs as root. A plan to run the units as a normal user is in the director-worker run folder (`parts/sec03-plan.md`, SEC-03) and waits for the 0.34.1 upgrade.
+Unprivileged container (`unprivileged: 1`, `nesting=1,keyctl=1`, `onboot: 1`, read with `pct config 136` on 2026-11-01). The three karakeep units run as the `karakeep` system user through drop-ins (`/etc/systemd/system/karakeep-{web,workers,browser}.service.d/10-user.conf`, SEC-03, 2026-11-01). Chromium is bound to localhost and runs with its sandbox on (`--no-sandbox` removed). Meilisearch still runs as root. Each unit first runs `/usr/local/sbin/karakeep-perms.sh` as root, which reapplies read access to `/opt/karakeep` and ownership of the data folder, because the community updater runs as root and resets both. After an update, confirm the drop-ins still exist. Undo: remove the three drop-in folders, `systemctl daemon-reload`, `chown -R root:root /opt/karakeep_data`, restart the units.
 
-Hardening done on 2026-11-01: new user sign-up is off (`DISABLE_SIGNUPS` is set in the env file). Root SSH login is key only (`PermitRootLogin without-password`, password login off, root password locked), set by a drop-in under `/etc/ssh/sshd_config.d/`. `avahi-daemon` and `postfix` are stopped and disabled. Port 3000 only accepts the sources in section 3 (nftables, `/etc/nftables.conf`; dropped attempts are logged with the prefix `kk3000-drop`). Unattended security updates are on (`20auto-upgrades`, `50unattended-upgrades`, Debian and Debian-Security origins). Updating Chromium does not restart `karakeep-browser`, so the running browser keeps the old build until that unit is restarted. The journal is capped at 100M and apt no longer keeps downloaded packages (`99no-keep-debs`).
+Hardening done on 2026-11-01: NPM host 53 sends HSTS, `X-Frame-Options` and `X-Content-Type-Options` through `more_set_headers` in its advanced config (plain `add_header` is cancelled by the `add_header` in NPM `proxy.conf`). New user sign-up is off (`DISABLE_SIGNUPS` is set in the env file). Root SSH login is key only (`PermitRootLogin without-password`, password login off, root password locked), set by a drop-in under `/etc/ssh/sshd_config.d/`. `avahi-daemon` and `postfix` are stopped and disabled. Port 3000 only accepts the sources in section 3 (nftables, `/etc/nftables.conf`; dropped attempts are logged with the prefix `kk3000-drop`). Unattended security updates are on (`20auto-upgrades`, `50unattended-upgrades`, Debian and Debian-Security origins). Updating Chromium does not restart `karakeep-browser`, so the running browser keeps the old build until that unit is restarted. The journal is capped at 100M and apt no longer keeps downloaded packages (`99no-keep-debs`).
 
 Listeners on 2026-11-01 (`ss -tlnup` as root): tcp 3000 `next-server` (all addresses), tcp 22 `sshd`, tcp 127.0.0.1:7700 `meilisearch`, 127.0.0.1:9222 `chromium`, 127.0.0.1:12345 `alloy` (its own HTTP port), 127.0.0.1:35883 `node dist/index.js` (the workers). No UDP listeners. The web UI is the only published port.
 
