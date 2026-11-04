@@ -3,7 +3,7 @@ title: Architecture — karakeep
 version: 0.1.1
 status: active
 last_edited_by: Claude Code
-last_edited_date: 2026-11-01
+last_edited_date: 2026-11-04
 parent: README.md
 children: []
 siblings: [CHANGELOG.md, CURSOR.md, BASELINES.md, TROUBLESHOOTING.md]
@@ -14,8 +14,8 @@ doc_type: architecture
 scope: service
 service_name: karakeep
 parent_doc: lab-standards/ARCHITECTURE.md
-depends_on: [proxmox, adguard, npm, tailscale, pbs]
-depended_on_by: []
+depends_on: [proxmox, adguard, npm, tailscale]
+depended_on_by: [commandcenter, prometheus]
 agent_context: true
 permission_tier: read-only
 last_verified: 2026-11-01
@@ -46,7 +46,7 @@ last_verified: 2026-11-01
 
 ## 1. Overview
 
-Karakeep (formerly Hoarder) saves links, page archives, and screenshots. This lab copy is for Jason. No lab service depends on it. The laptop import script and the Cursor key call its API.
+Karakeep (formerly Hoarder) saves links, page archives, and screenshots. This lab copy is for Jason. Command Center and Prometheus read it (Prometheus scrapes its metrics). The laptop import script and the Cursor key call its API.
 
 The app is Karakeep **0.34.1** (upgraded by Jason 2026-11-01, Node 24, Meilisearch 1.56.0), installed by the Proxmox VE community script on 2026-10-08. It is not a Docker Compose stack.
 
@@ -103,11 +103,10 @@ Workers start after the browser and Meilisearch. The web unit starts after the w
 | `adguard` | The name `karakeep.yingson.com` |
 | `npm` | TLS on that name |
 | `tailscale` | Off-LAN admin reach |
-| `pbs` | Nightly guest snapshots (job is `all`) |
 
-Nothing depends on `karakeep`. Blast radius is Low.
+Backup (PBS nightly, Kopia) and monitoring (Loki through Alloy, Prometheus, Uptime Kuma) are not listed as dependencies (LAB-DEC-100). `commandcenter` and `prometheus` depend on `karakeep` because they read it. Nothing else does. Blast radius is Low.
 
-OpenRouter (`https://openrouter.ai/api/v1`, model `google/gemini-2.5-flash-lite`) is used for auto-tagging only. The archive, crawl, and screenshots keep working if OpenRouter is down. Tagging jobs wait until it answers. Page text for a tag call leaves the guest.
+OpenRouter (`https://openrouter.ai/api/v1`, model `google/gemini-2.5-flash-lite`) is used for auto-tagging only. OpenRouter is an outside service with no lab slug, so it is described here and not in the dependency lists. The archive, crawl, and screenshots keep working if OpenRouter is down. Tagging jobs wait until it answers. Page text for a tag call leaves the guest.
 
 **Privacy.** Saving a bookmark sends the page text to OpenRouter, and OpenRouter passes it on to the model provider (Google, for `google/gemini-2.5-flash-lite`). The image model is set to the same model, so images can go the same way. The exact fields sent are not verified. The 844 bookmarks retagged on 2026-10-12 went the same way. Whether private or signed-in pages must stay out of OpenRouter is Jason's decision and is still open (review finding INT-01).
 

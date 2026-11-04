@@ -3,7 +3,7 @@ title: CURSOR — karakeep
 version: 0.1.0
 status: active
 last_edited_by: Claude Code
-last_edited_date: 2026-11-01
+last_edited_date: 2026-11-04
 parent: README.md
 children: []
 siblings: [CLAUDE.md, ARCHITECTURE.md, CHANGELOG.md]
@@ -14,8 +14,8 @@ doc_type: agent-briefing
 scope: service
 service_name: karakeep
 parent_doc: lab-standards/ARCHITECTURE.md
-depends_on: [proxmox, adguard, npm, tailscale, pbs]
-depended_on_by: []
+depends_on: [proxmox, adguard, npm, tailscale]
+depended_on_by: [commandcenter, prometheus]
 agent_context: true
 permission_tier: read-only
 last_verified: 2026-11-01

@@ -3,7 +3,7 @@ title: Changelog — karakeep
 version: 0.1.0
 status: active
 last_edited_by: Claude Code
-last_edited_date: 2026-11-01
+last_edited_date: 2026-11-04
 parent: README.md
 children: []
 siblings: [ARCHITECTURE.md, CURSOR.md, CLAUDE.md]
@@ -14,8 +14,8 @@ doc_type: changelog
 scope: service
 service_name: karakeep
 parent_doc: lab-standards/ARCHITECTURE.md
-depends_on: [proxmox, adguard, npm, tailscale, pbs]
-depended_on_by: []
+depends_on: [proxmox, adguard, npm, tailscale]
+depended_on_by: [commandcenter, prometheus]
 agent_context: true
 permission_tier: read-only
 last_verified: 2026-11-01
@@ -28,6 +28,8 @@ All notable changes to **karakeep** are documented here. Prepend only.
 ---
 
 ## [Unreleased]
+
+- [OPS] **2026-11-04: Sprint 0 doc fixes and LAB-DEC-100 dependency edges (push 04b, lane MAP-DATA).** Docs only. Frontmatter edges: pbs dropped from depends_on; commandcenter and prometheus added to depended_on_by. ARCHITECTURE prose matches.
 
 - [OPS] **PAT-01, SEC-03 and SEC-10 closed (2026-11-01).** Jason ran the upgrade to 0.34.1 (Node 24, Meilisearch 1.56.0, bookmarks 953 before and after). The units now run as `karakeep`, Chromium has its sandbox on, and NPM host 53 sends three security headers. SEC-03 caused an outage of about 3 minutes, from about 20:55 to 20:58 PST: the release files were not readable by other users, and the stage test had only checked one file. A throwaway bookmark crawled and was deleted. Findings now 52 of 67 fixed. `no decision`.
 

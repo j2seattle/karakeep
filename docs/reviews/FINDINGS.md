@@ -3,7 +3,7 @@ title: Findings: karakeep
 version: 1.0.0
 status: active
 last_edited_by: Claude Code
-last_edited_date: 2026-11-01
+last_edited_date: 2026-11-04
 audience: internal
 tags: [yingson-labs, karakeep, service-review, findings]
 summary: "Rolling list of Service Review findings for karakeep (CT 136). Run 1, 2026-11-01: 67 findings. Fix run 2026-11-01 closed most; the table shows what is still open. The dated review file holds the checklist, scorecard and sprint plan."
@@ -27,6 +27,7 @@ Process: lab-standards `docs/SERVICE-REVIEW.md` · Run log: lab-standards `servi
 | 1 | 2026-11-01 | review (read only, nothing changed on any server) | critical 0, high 3, medium 21, low 43 (67 total) | [2026-11-01-service-review.md](2026-11-01-service-review.md) |
 | 2 | 2026-11-01 | fix | open: critical 0, high 0, medium 6, low 9 (15 of 67 still open, 52 fixed; PAT-01, SEC-03, SEC-10 closed later on 2026-11-01) | this file |
 
+| 3 | 2026-11-04 | fix (Sprint 0 remainder, lane MAP-DATA) | fixed 0, not needed 0, still open 2, needs Jason 2 (INT-03 re-checked, stays fixed) | this file |
 Fix run 2026-11-01 (docs lane final pass): states below come from lane replies the coordinator checked. Readiness stays R3 (Dashlane copies unconfirmed, no Kopia test restore). Connected level C2. One regression found on the way: the Homarr tile pings the IP and the new port 3000 rule blocks Homarr (see HLT-04).
 
 Basis: karakeep HEAD `90baf74` (the working tree had 7 uncommitted files from another session, used as leads only), lab-standards `45dc495`. Every finding is `new` except INT-04, which is moved to WISH-088. IDs are never reused. Severity rulings by the coordinator are applied: BAK-01 high, BAK-02 medium, PAT-02 medium, DOC-01 medium.
@@ -445,6 +446,7 @@ Category SPD · Severity medium · State fixed (verified) 2026-11-01
 ### INT-01. OpenRouter is a live dependency that no lab table declares; bookmark content already leaves the lab for tagging
 
 Category INT · Severity medium · State still open: docs done; Jason decides keep or exclude (batch)
+- **Fix run 2026-11-04 (push 04b, lane MAP-DATA):** OpenRouter is documented in ARCHITECTURE section 5 prose (no slug exists for it, so no table edge). Still missing: Jason's decision whether any bookmarks must stay out of OpenRouter.
 
 - Standard: SERVICE-REVIEW D. Owner: jason. Severity: medium. Effort: S for the doc; the privacy decision is Jason's. Approval: none. Your call: yes.
 - Evidence: Loki 7 days, `{service="karakeep",unit="karakeep-web.service"} |~ "(?i)openrouter"` = 312 lines (D0 counted 316 across all units, and 0 for `11434`). `SERVICE-DEPENDENCIES.md:137` says Ollama CT 112 for tagging, and the `TOOLS.yaml` OpenRouter `lab_use` names only Hermes. The working tree `ARCHITECTURE.md` and `RUNBOOK.md` say OpenRouter `google/gemini-2.5-flash-lite` for text and images (RUNBOOK Tagging section, line 85 of the working tree). The guest env cannot be read, so the live model name, and exactly which fields are sent, are unverified. Whether images are sent is also unverified (the working tree says the image model is set).
@@ -467,6 +469,7 @@ Category INT · Severity low · State still open: waiting on Jason batch (separa
 ### INT-03. Dependency edges are not declared in both directions
 
 Category INT · Severity low · State fixed (verified) 2026-11-01
+- **Fix run 2026-11-04 (push 04b, lane MAP-DATA):** Edges re-set under LAB-DEC-100. Frontmatter depends_on is proxmox, adguard, npm, tailscale (pbs dropped: backup link). depended_on_by is commandcenter, prometheus (they read karakeep). ARCHITECTURE sections 1 and 5 prose now match. Loki and Alloy are monitoring and OpenRouter has no slug, so neither is a declared edge; the OpenRouter use is documented in ARCHITECTURE section 5 prose. Undo: git revert of the push 04b commit for this repo.
 
 - Standard: SERVICE-REVIEW D (edges both ways). Owner: chief. Severity: low. Effort: S. Approval: none. Your call: no.
 - Evidence: `SERVICE-DEPENDENCIES.md:137` says "Nothing else calls Karakeep" and lists no OpenRouter, Loki or Alloy. Live: the laptop holds `karakeep.env`, `karakeep-hermes.env` and `karakeep-openrouter.env` under `~/.cursor/mcps` (names only), so at least Hermes and Cursor have or are meant to have a credential. `SERVICE-INVENTORY.md:295` lists the API as `rest`, `api-key`, MCP `needs-wrapper`, tier `read-only`. Live: `GET /api/v1/bookmarks` without a key returns 401 on `192.168.30.33:3000`, so the API answers and wants a key. Logs flow to Loki through Alloy (unit `alloy.service` active; Loki `service="karakeep"` present, D0). The Discord link archive on the laptop feeds Karakeep by script (INT-04).
@@ -576,6 +579,7 @@ Category DOC · Severity low · State fixed (verified) 2026-11-01
 ### DOC-04. Working tree contradicts itself on the curated tag count (26 or 25)
 
 Category DOC · Severity medium · State still open: Jason picks 25 or 26 curated tags
+- **Fix run 2026-11-04 (push 04b, lane MAP-DATA):** Still missing: Jason picks 25 or 26 curated tags.
 
 - Standard: SERVICE-REVIEW H · Owner: jason · Severity: medium · Effort: S · Approval: none
 - Evidence: WT CHANGELOG.md entries "26 to 25" and "The 26 curated tags were kept"; WT ARCHITECTURE.md section 8 says 26
