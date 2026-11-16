@@ -29,8 +29,15 @@ def dup_key(url: str) -> str:
     p = urlsplit(url)
     host = p.netloc.lower().removeprefix("www.")
     path = p.path.rstrip("/")
-    if host.endswith("youtube.com") or host == "youtu.be":
-        return f"{host}{path}?v={dict(parse_qsl(p.query)).get('v', '')}"
+    # YouTube: key by video id, whatever the link form (watch?v=, embed/, shorts/, live/, youtu.be/) (WISH-950).
+    if host == "youtu.be":
+        return "youtube:" + path.strip("/").split("/")[0]
+    if host.endswith("youtube.com"):
+        parts = [x for x in path.split("/") if x]
+        if parts and parts[0] in ("embed", "shorts", "live", "v") and len(parts) > 1:
+            return "youtube:" + parts[1]
+        vid = dict(parse_qsl(p.query)).get("v", "")
+        return "youtube:" + vid if vid else host + path
     return host + path
 
 
