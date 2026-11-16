@@ -42,6 +42,11 @@ NEW_LISTS = [
      "#trading or #reading"),
     ("Last 7 days", "\U0001F551", "Saved in the last seven days.", "age:<7d"),
     ("Untagged", "\U0001F3F7", "Bookmarks with no tag at all.", "-is:tagged"),
+    # Approved by Jason 2026-11-16 (one tag each).
+    ("Security", "\U0001F512", "Links tagged security.", "#security"),
+    ("Skills", "\U0001F9E9", "Links tagged skills.", "#skills"),
+    ("MCP", "\U0001F50C", "Links tagged mcp.", "#mcp"),
+    ("Claude", "✨", "Links tagged claude.", "#claude"),
 ]
 
 # Existing smart lists: name -> (new query, new description)
