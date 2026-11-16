@@ -3,7 +3,7 @@ title: Architecture — karakeep
 version: 0.1.1
 status: active
 last_edited_by: Claude Code
-last_edited_date: 2026-11-04
+last_edited_date: 2026-11-16
 parent: README.md
 children: []
 siblings: [CHANGELOG.md, CURSOR.md, BASELINES.md, TROUBLESHOOTING.md]
@@ -106,9 +106,11 @@ Workers start after the browser and Meilisearch. The web unit starts after the w
 
 Backup (PBS nightly, Kopia) and monitoring (Loki through Alloy, Prometheus, Uptime Kuma) are not listed as dependencies (LAB-DEC-100). `commandcenter` and `prometheus` depend on `karakeep` because they read it. Nothing else does. Blast radius is Low.
 
-OpenRouter (`https://openrouter.ai/api/v1`, model `google/gemini-2.5-flash-lite`) is used for auto-tagging only. OpenRouter is an outside service with no lab slug, so it is described here and not in the dependency lists. The archive, crawl, and screenshots keep working if OpenRouter is down. Tagging jobs wait until it answers. Page text for a tag call leaves the guest.
+OpenRouter (`https://openrouter.ai/api/v1`, model `google/gemini-2.5-flash-lite`) is used for auto-tagging and, since 2026-11-16, for semantic search embeddings. OpenRouter is an outside service with no lab slug, so it is described here and not in the dependency lists. The archive, crawl, and screenshots keep working if OpenRouter is down. Tagging jobs wait until it answers. Page text for a tag call leaves the guest.
 
 **Privacy.** Saving a bookmark sends the page text to OpenRouter, and OpenRouter passes it on to the model provider (Google, for `google/gemini-2.5-flash-lite`). The image model is set to the same model, so images can go the same way. The exact fields sent are not verified. The 844 bookmarks retagged on 2026-10-12 went the same way. Whether private or signed-in pages must stay out of OpenRouter is Jason's decision and is still open (review finding INT-01).
+
+**Embeddings (2026-11-16).** Semantic search sends bookmark text to OpenRouter (`openai/text-embedding-3-small`, 1536 dimensions) through the same `OPENAI_BASE_URL` and key as tagging, so it adds no new outside service and no new exposure beyond the tagging path. Vectors are stored in the local Meilisearch (index `bookmarks_vectors`); there is no new database. If OpenRouter is down, new bookmarks wait in the `embeddings` queue and keyword search keeps working. Switching later (for example to a local Ollama model) means changing the model and dimension and embedding everything again, which takes minutes and costs cents.
 
 Other edges: the guest ships its journal to Loki (CT 138) through Alloy. The laptop import script (`scripts/import-to-karakeep.py`) and the Cursor key call the REST API. Whether Hermes calls Karakeep is not verified.
 
@@ -146,10 +148,18 @@ The live file is `/etc/karakeep/karakeep.env`. Names are listed in [.env.example
 | `OPENAI_BASE_URL` | `https://openrouter.ai/api/v1` |
 | `INFERENCE_TEXT_MODEL` | `google/gemini-2.5-flash-lite` |
 | `INFERENCE_IMAGE_MODEL` | `google/gemini-2.5-flash-lite` |
+| `EMBEDDING_ENABLE_AUTO_INDEXING` | `true` (set 2026-11-16). New and changed bookmarks are embedded by themselves. |
+| `SEMANTIC_SEARCH_ENABLED` | `true` (the default; set so the file says so) |
+| `EMBEDDING_TEXT_MODEL` | `openai/text-embedding-3-small` |
+| `EMBEDDING_DIMENSIONS` | `1536`. Must match the model. Changing the model or this number means every bookmark must be embedded again. |
+| `EMBEDDING_NUM_WORKERS` | `2` for the first backfill; the plan is to return it to `1` |
+| `EMBEDDING_OPENAI_BASE_URL` / `EMBEDDING_OPENAI_API_KEY` | Not set. They default to the `OPENAI_*` values above. A separate Karakeep OpenRouter key is planned (WISH-259c). |
 
 The laptop file `C:\Users\thedu\.cursor\mcps\karakeep.env` is only the Cursor URL and API key. Inference settings belong in the guest file. After editing that file, restart both `karakeep-web` and `karakeep-workers`. The AI Settings link is hidden until the web process sees `OPENAI_API_KEY`.
 
 User Settings → **AI Settings** (`/settings/ai`): **Auto-tagging** on for new saves since the 2026-10-12 Gemini test, **Auto-summarization** off, **Tag Style** lowercase with hyphens. Curated tags are still the 26 Jason selected on 2026-10-08 (`github`, `x`, `reddit`, `tools`, `agents`, and the rest of that set). The guest env points text and image inference at OpenRouter `google/gemini-2.5-flash-lite`. Eight existing items were retagged that day and stayed inside those 26 tags, then the rest of the library was retagged the same day. 844 bookmarks show tagging success. 71 still have an AI tag outside the 26.
+
+**Semantic search (on since 2026-11-16 00:15).** Search modes `semantic` and `hybrid` work through the API and the search box. The coordinator ran `scripts/enable-semantic-search.sh` (it backs up the env file to `/etc/karakeep/karakeep.env.bak-20261116`, sets the names above, and restarts the workers and then the web unit) and started the backfill from Admin, Background Jobs. On 2026-11-16 all 997 bookmarks reached `embeddingStatus` success and Meilisearch holds 997 vectors. The Meilisearch directory grew from 157 MB (2026-11-01) to 239 MB, and the guest had about 2.7 GB of RAM free. The undo export taken before the change is in `C:\Users\thedu\karakeep-exports\20261116-pre-window\` on the laptop (tags with who attached them, tags, lists with manual members, settings, rules and prompts; see the RUNBOOK).
 
 Rules fire when a bookmark is added. They do not retag the imported set:
 
@@ -169,7 +179,7 @@ Vault references, when Jason has stored them:
 - `vault://dashlane/yingson-labs/karakeep/cursor-api-key`
 - `vault://dashlane/yingson-labs/karakeep/openrouter-api-key` (the value of `OPENAI_API_KEY`)
 
-Whether each of these Dashlane entries exists is not confirmed. Jason must confirm (review findings BAK-05, DOC-07, SEC-08). The live file `/etc/karakeep/karakeep.env` holds these names: `SERVER_VERSION`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `DATA_DIR`, `MEILI_ADDR`, `MEILI_MASTER_KEY`, `BROWSER_WEB_URL`, `DB_WAL_MODE`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `INFERENCE_TEXT_MODEL`, `INFERENCE_IMAGE_MODEL`. A rebuild from scratch needs `NEXTAUTH_SECRET`, `MEILI_MASTER_KEY` and the OpenRouter key; a PBS restore brings them back inside the guest.
+Whether each of these Dashlane entries exists is not confirmed. Jason must confirm (review findings BAK-05, DOC-07, SEC-08). The live file `/etc/karakeep/karakeep.env` holds these names: `SERVER_VERSION`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `DATA_DIR`, `MEILI_ADDR`, `MEILI_MASTER_KEY`, `BROWSER_WEB_URL`, `DB_WAL_MODE`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `INFERENCE_TEXT_MODEL`, `INFERENCE_IMAGE_MODEL`, `PROMETHEUS_AUTH_TOKEN`, `EMBEDDING_ENABLE_AUTO_INDEXING`, `SEMANTIC_SEARCH_ENABLED`, `EMBEDDING_TEXT_MODEL`, `EMBEDDING_DIMENSIONS`, `EMBEDDING_NUM_WORKERS`. A rebuild from scratch needs `NEXTAUTH_SECRET`, `MEILI_MASTER_KEY` and the OpenRouter key; a PBS restore brings them back inside the guest.
 
 The container root password currently exists only as `/root/karakeep-lxc-root.password` on the Proxmox host.
 
@@ -189,7 +199,9 @@ Two copies exist. PBS snapshots the whole guest nightly, but a snapshot of a run
 
 **Protect list** (what a rebuild needs): the SQLite database (`/opt/karakeep_data/db.db`), the assets (`/opt/karakeep_data/assets`), and `/etc/karakeep/karakeep.env`. Not saved by design: `queue.db`, `/var/lib/meilisearch`, `/opt/karakeep` (rebuilt by the community script).
 
-**Restore.** The PBS restore to a scratch CT was tested on 2026-11-01 (BAK-02): backup `ct/136/2026-11-01T10:18:40Z` restored to CT 197 with no network, four units active, health and sign-in 200, SQLite integrity ok, 947 bookmarks, then destroyed. Steps are in [docs/RUNBOOK.md](docs/RUNBOOK.md). The Kopia copy has not been restored yet. A scratch restore is not R4 on its own. Per-snapshot PBS verify state can be read with `pvesh get /nodes/proxmox/storage/pbs-backups/content --vmid 136`. A manual snapshot `pre_karakeep_fix_20261101_exp20261115` was taken before the fix run.
+**Restore.** The PBS restore to a scratch CT was tested on 2026-11-01 (BAK-02): backup `ct/136/2026-11-01T10:18:40Z` restored to CT 197 with no network, four units active, health and sign-in 200, SQLite integrity ok, 947 bookmarks, then destroyed. Steps are in [docs/RUNBOOK.md](docs/RUNBOOK.md). The Kopia copy has not been restored yet. A scratch restore is not R4 on its own. Per-snapshot PBS verify state can be read with `pvesh get /nodes/proxmox/storage/pbs-backups/content --vmid 136`. A manual snapshot `pre_karakeep_fix_20261101_exp20261115` was taken before the fix run. Another, `pre_kkwindow_20261116_exp20261123`, was taken before the 2026-11-16 window, with a Kopia run just after it.
+
+**Vectors have no backup of their own, by design.** The embeddings live in Meilisearch, which Kopia does not save and only the PBS snapshot holds. They are rebuilt from `db.db` in minutes for a few cents (997 bookmarks on 2026-11-16). After any restore from PBS or Kopia, run the embeddings backfill (RUNBOOK, Semantic search). A copy taken before 2026-11-16 has no `EMBEDDING_*` lines: run `scripts/enable-semantic-search.sh` first.
 
 ## 11. Monitoring & Health
 
@@ -202,7 +214,7 @@ Two copies exist. PBS snapshots the whole guest nightly, but a snapshot of a run
 
 Both returned `200 - OK` at 2026-10-08 17:31 UTC. Notification id 1 (Yingson Labs Discord `#alerts`). Jason confirmed the down and the up the same day.
 
-**Alerts (2026-11-01).** Prometheus rules `KarakeepUnitNotActive` and `KarakeepUnitMetricMissing` (any of the four units not active for 5 minutes), `KarakeepUnitRestarting`, `KarakeepSlowResponse` and `KarakeepFlapping` (monitor 115 or 116), and the lab-wide `PbsBackupStale` and `PbsGuestHasNoBackup` (36 hours) route through Alertmanager to Discord `#alerts`. Prometheus scrapes `http://192.168.30.33:3000/api/metrics` as job `karakeep` with a bearer token kept in a file on the Prometheus host (not in git). A textfile metric from `scripts/karakeep-health-textfile.sh` (cron every 5 minutes, root) gives `karakeep_bookmarks_total`, `karakeep_health_probe_success`, `karakeep_last_crawl_timestamp_seconds` and `karakeep_queue_oldest_pending_timestamp_seconds` through the Alloy textfile collector. An alert on error text in Loki is not possible yet because the Loki ruler is not set up (WISH-270).
+**Alerts (2026-11-01).** Prometheus rules `KarakeepUnitNotActive` and `KarakeepUnitMetricMissing` (any of the four units not active for 5 minutes), `KarakeepUnitRestarting`, `KarakeepSlowResponse` and `KarakeepFlapping` (monitor 115 or 116), and the lab-wide `PbsBackupStale` and `PbsGuestHasNoBackup` (36 hours) route through Alertmanager to Discord `#alerts`. Prometheus scrapes `http://192.168.30.33:3000/api/metrics` as job `karakeep` with a bearer token kept in a file on the Prometheus host (not in git). A textfile metric from `scripts/karakeep-health-textfile.sh` (cron every 5 minutes, root) gives `karakeep_bookmarks_total`, `karakeep_health_probe_success`, `karakeep_last_crawl_timestamp_seconds` and `karakeep_queue_oldest_pending_timestamp_seconds` through the Alloy textfile collector. Since 2026-11-16 the same script also gives `karakeep_embeddings_pending`, `karakeep_embeddings_failed`, `karakeep_embeddings_success` (counts of `bookmarks.embeddingStatus`, read from `db.db` read only), `karakeep_embedding_vectors` (vectors in the Meilisearch `bookmarks_vectors` index) and `karakeep_semantic_search_ok`. The probe asks Meilisearch on `127.0.0.1:7700` with the master key that `/etc/karakeep/karakeep.env` already holds, read inside the script and never printed. It is 1 when the vectors index has vectors and its embedder has the configured dimension. It is a keyless index check and not a real search: it does not prove the search route answers, because that needs a Karakeep API key and the full-access key does not go on the guest. Two `info` rules go to `#alerts`: `KarakeepEmbeddingsFailing` (failed above 10 for 30 minutes) and `KarakeepEmbeddingsBacklog` (pending above 20 for 2 hours; expected during a re-embed after a model change). The existing `KarakeepQueueStuck` also covers the `embeddings` queue. The plan's `KarakeepSemanticSearchDown` rule was not added; the series exists and can be alerted on later. An alert on error text in Loki is not possible yet because the Loki ruler is not set up (WISH-270).
 
 **Live Alloy config.** CT 136 runs Alloy 1.21.3 (the hold was lifted on 2026-11-01). `/etc/alloy/config.alloy` drops the query string of `checkUrl` request lines before shipping (MON-05), so new lines hold no session tokens; older lines age out of Loki by about 2027-01-30. `/etc/alloy/metrics.alloy` holds the metrics side. Copies with no secrets (scanned) are in [config/](config/). Backups on the guest: `/etc/alloy/*.bak-20261101*`. Edit the guest file first, then refresh the copy here.
 
@@ -218,6 +230,8 @@ Logs go to Loki (CT 138) through Grafana Alloy, installed 2026-10-23 on CT 136: 
 | Tier | `read-only` |
 
 The human UI is a login session. The Cursor key is in `C:\Users\thedu\.cursor\mcps\karakeep.env`. Do not copy it into git or chat.
+
+Search: tRPC `bookmarks.searchBookmarks` takes `searchMode` `keyword`, `semantic` or `hybrid`. Semantic and hybrid return 400 "Semantic search is not enabled" when the section 8 settings are off (the state before 2026-11-16). API keys have scopes (for example `bookmarks:read`), and keys can be created only from a browser session, so a read-only key for agents is Jason's to make.
 
 Deleting bookmarks or `/opt/karakeep_data` is destructive. No token will be issued for that.
 

@@ -2,13 +2,16 @@
 # MON-02 (2026-11-01): read-only deeper health check for Karakeep, as a textfile metric.
 # Runs as root from /etc/cron.d/karakeep-health every 5 minutes on CT 136.
 # Reads queue.db and db.db with mode=ro. Prints counts and times only, never a URL or a title.
+# 2026-11-16 (run karakeep-window, lane MON): adds semantic search metrics. Embedding counts come from db.db
+# (bookmarks.embeddingStatus). The probe asks Meilisearch on 127.0.0.1:7700 with the master key read from
+# /etc/karakeep/karakeep.env inside this script (never printed, never exported). No Karakeep API key is used.
 # Alloy's node exporter textfile collector picks up /var/lib/yingson-telemetry/karakeep.prom.
 set -eu
 DATA=/opt/karakeep_data
 OUT=/var/lib/yingson-telemetry/karakeep.prom
 TMP="$OUT.tmp"
 python3 - "$DATA" > "$TMP" <<'PY'
-import sqlite3, sys, time
+import json, sqlite3, sys, time, urllib.request
 d = sys.argv[1]
 print("# HELP karakeep_queue_tasks Queued tasks in queue.db by queue and status.")
 print("# TYPE karakeep_queue_tasks gauge")
@@ -30,8 +33,45 @@ try:
     print("# HELP karakeep_bookmarks_total Bookmarks in the library.")
     print("# TYPE karakeep_bookmarks_total gauge")
     print("karakeep_bookmarks_total %d" % total)
+    st = dict(b.execute("select coalesce(embeddingStatus,'none'), count(*) from bookmarks group by 1").fetchall())
+    print("# HELP karakeep_embeddings_pending Bookmarks whose embedding is waiting (embeddingStatus pending or empty).")
+    print("# TYPE karakeep_embeddings_pending gauge")
+    print("karakeep_embeddings_pending %d" % (st.get("pending", 0) + st.get("none", 0)))
+    print("# HELP karakeep_embeddings_failed Bookmarks whose embedding failed (embeddingStatus failure).")
+    print("# TYPE karakeep_embeddings_failed gauge")
+    print("karakeep_embeddings_failed %d" % st.get("failure", 0))
+    print("# HELP karakeep_embeddings_success Bookmarks with a finished embedding (embeddingStatus success).")
+    print("# TYPE karakeep_embeddings_success gauge")
+    print("karakeep_embeddings_success %d" % st.get("success", 0))
 except Exception:
     ok = 0
+# Semantic probe: the Meilisearch vectors index exists, its embedder has the configured dimension, and it holds vectors.
+sem_ok, vectors = 0, 0
+try:
+    env = {}
+    for line in open("/etc/karakeep/karakeep.env"):
+        if "=" in line and not line.startswith("#"):
+            k, v = line.strip().split("=", 1)
+            env[k] = v.strip('"')
+    addr = env.get("MEILI_ADDR", "http://127.0.0.1:7700")
+    hdr = {"Authorization": "Bearer " + env["MEILI_MASTER_KEY"]}
+    def get(path):
+        return json.load(urllib.request.urlopen(urllib.request.Request(addr + path, headers=hdr), timeout=5))
+    vectors = get("/indexes/bookmarks_vectors/stats").get("numberOfEmbeddings", 0)
+    dims = [e.get("dimensions") for e in get("/indexes/bookmarks_vectors/settings/embedders").values()]
+    want = int(env.get("EMBEDDING_DIMENSIONS", "0"))
+    if env.get("SEMANTIC_SEARCH_ENABLED", "true") == "false":
+        sem_ok = 0
+    elif vectors > 0 and want in dims:
+        sem_ok = 1
+except Exception:
+    sem_ok = 0
+print("# HELP karakeep_semantic_search_ok 1 when Meilisearch holds vectors of the configured dimension.")
+print("# TYPE karakeep_semantic_search_ok gauge")
+print("karakeep_semantic_search_ok %d" % sem_ok)
+print("# HELP karakeep_embedding_vectors Vectors stored in the Meilisearch bookmarks_vectors index.")
+print("# TYPE karakeep_embedding_vectors gauge")
+print("karakeep_embedding_vectors %d" % vectors)
 print("# HELP karakeep_health_probe_success 1 when the databases could be read.")
 print("# TYPE karakeep_health_probe_success gauge")
 print("karakeep_health_probe_success %d" % ok)

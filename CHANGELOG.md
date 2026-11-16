@@ -3,7 +3,7 @@ title: Changelog — karakeep
 version: 0.1.0
 status: active
 last_edited_by: Claude Code
-last_edited_date: 2026-11-04
+last_edited_date: 2026-11-16
 parent: README.md
 children: []
 siblings: [ARCHITECTURE.md, CURSOR.md, CLAUDE.md]
@@ -28,6 +28,8 @@ All notable changes to **karakeep** are documented here. Prepend only.
 ---
 
 ## [Unreleased]
+
+- [OPS] [agent-context] **2026-11-16: semantic search documented and monitored (run karakeep-window, lane MON).** The coordinator turned on OpenRouter embeddings (`openai/text-embedding-3-small`, 1536) at 00:15 and all 997 bookmarks were embedded the same day. `scripts/karakeep-health-textfile.sh` now also exports `karakeep_embeddings_pending`, `_failed`, `_success`, `karakeep_embedding_vectors` and `karakeep_semantic_search_ok` (deployed to CT 136, runs every 5 minutes; the old script is saved on the Proxmox host as `/root/karakeep-health-textfile.sh.bak-20261116`). Two `info` Prometheus rules are live on CT 133 (prometheus repo). ARCHITECTURE sections 5, 8, 10, 11, 12 and the RUNBOOK (Semantic search: check, backfill, model change, undo, after a restore) are updated, and `.env.example` lists the new names. no decision.
 
 - [OPS] **2026-11-04: Sprint 0 doc fixes and LAB-DEC-100 dependency edges (push 04b, lane MAP-DATA).** Docs only. Frontmatter edges: pbs dropped from depends_on; commandcenter and prometheus added to depended_on_by. ARCHITECTURE prose matches.
 

@@ -3,7 +3,7 @@ title: Runbook — karakeep
 version: 0.1.0
 status: active
 last_edited_by: Claude Code
-last_edited_date: 2026-11-01
+last_edited_date: 2026-11-16
 parent: ARCHITECTURE.md
 children: []
 siblings: [TROUBLESHOOTING.md, ARCHITECTURE.md]
@@ -97,6 +97,22 @@ Run at `jason@proxmox` as one script (`ssh proxmox 'sudo bash -s' < restore-test
 7. Append one line to `lab-standards/restore-tests/restore-log.jsonl`.
 
 Result 2026-11-01: backup `ct/136/2026-11-01T10:18:40Z`, integrity ok, 947 bookmarks, 1 user. To rebuild from the Kopia copy instead, restore the `db.sqlite3` and `etc-karakeep` snapshot of `/var/backups/kopia/karakeep` and the assets snapshot with `kopia restore` into a scratch location (not yet rehearsed).
+
+## Semantic search (on since 2026-11-16)
+
+Settings live in `/etc/karakeep/karakeep.env` (names in ARCHITECTURE section 8). Vectors are in Meilisearch index `bookmarks_vectors`. They are not backed up on their own because they are rebuilt from `db.db`.
+
+**Check.** On the guest: `grep -E '^karakeep_(embed|semantic)' /var/lib/yingson-telemetry/karakeep.prom`. Healthy is `karakeep_semantic_search_ok 1`, `karakeep_embeddings_pending 0`, `karakeep_embeddings_failed 0`, and `karakeep_embedding_vectors` equal to `karakeep_bookmarks_total` (997 on 2026-11-16). The same series are in Prometheus. Alerts `KarakeepEmbeddingsFailing` and `KarakeepEmbeddingsBacklog` go to `#alerts` as `info`.
+
+**Run the backfill again** (after a restore, a model change or a failure alert): sign in as admin, Admin, Background Jobs, run the regenerate embeddings job. Watch `karakeep_embeddings_pending` fall. The first run of 997 bookmarks finished within hours at `EMBEDDING_NUM_WORKERS=2` and cost cents. If `karakeep_embeddings_failed` stays above 0, read counts only from the worker journal (`journalctl -u karakeep-workers --since -1h | grep -ci embedding`, never paste lines) and check the OpenRouter key and credit, and that `EMBEDDING_DIMENSIONS` matches the model (1536 for `openai/text-embedding-3-small`).
+
+**Change the model.** Edit `EMBEDDING_TEXT_MODEL` and `EMBEDDING_DIMENSIONS` together in the env file, restart `karakeep-workers` then `karakeep-web`, then run the backfill. `KarakeepEmbeddingsBacklog` may fire after 2 hours while it runs; that is expected.
+
+**Undo semantic search.** On the guest: `cp -p /etc/karakeep/karakeep.env.bak-20261116 /etc/karakeep/karakeep.env; systemctl restart karakeep-workers karakeep-web`. That file is the one from before the change, with no `EMBEDDING_*` names. Keyword search is unaffected. The vectors index stays in Meilisearch and is harmless; drop it only on Jason's say. The two embedding alerts and `karakeep_semantic_search_ok` will then report stale or zero values; tell the coordinator so the rules can be removed. Never delete bookmarks to undo anything.
+
+**Undo the 2026-11-16 tag and list changes.** The export taken before the window is on the laptop in `C:\Users\thedu\karakeep-exports\20261116-pre-window\`: `bookmarks-tags.json` (every bookmark's tags with who attached them), `tags.json`, `lists.json` (with manual list members), `settings-rules-prompts.json`. Prefer re-applying the export through the API. The whole-guest rollback is the snapshot `pre_kkwindow_20261116_exp20261123` (expires 2026-11-23): `pct rollback 136 pre_kkwindow_20261116_exp20261123` on the Proxmox host, which loses everything saved after it.
+
+**After a restore.** A PBS restore brings back `db.db`, the env file and Meilisearch as of that backup. A Kopia rebuild brings back `db.db` and the env file, and Meilisearch starts empty. In both cases: confirm the `EMBEDDING_*` names are in the env file, restart the workers and web, run the backfill above, and wait for `karakeep_embeddings_pending 0`. In a scratch restore (see below), add to step 5: `numberOfEmbeddings` in Meilisearch `/indexes/bookmarks_vectors/stats` should be near the bookmark count (read it with the master key inside a script, never print the key).
 
 ## Tagging, rules, and lists
 
