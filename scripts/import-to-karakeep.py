@@ -17,6 +17,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tags"))
+import mapping  # noqa: E402  (tag vocabulary, WISH-913)
+
 ROOT = Path(r"C:\Users\thedu\discord-link-archive")
 ITEMS = ROOT / "items"
 ENV_FILE = Path(r"C:\Users\thedu\.cursor\mcps\karakeep.env")
@@ -104,7 +107,11 @@ def main() -> int:
         bookmark_id = payload["id"]
         created += 1
         tag_ok = True
-        for tag in item.get("tags") or []:
+        # Source categories (other, media, post, ...) become one tag, src-discord.
+        # Old topic tags map to the curated vocabulary; host tags are kept.
+        item_tags = sorted(mapping.desired_tags([(t, "human") for t in item.get("tags") or []]))
+        item_tags = [mapping.SRC_TAG] + [t for t in item_tags if t != mapping.SRC_TAG]
+        for tag in item_tags:
             tag_status, _ = request(
                 base,
                 key,
