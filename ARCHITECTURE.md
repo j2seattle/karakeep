@@ -149,7 +149,7 @@ The live file is `/etc/karakeep/karakeep.env`. Names are listed in [.env.example
 
 The laptop file `C:\Users\thedu\.cursor\mcps\karakeep.env` is only the Cursor URL and API key. Inference settings belong in the guest file. After editing that file, restart both `karakeep-web` and `karakeep-workers`. The AI Settings link is hidden until the web process sees `OPENAI_API_KEY`.
 
-User Settings → **AI Settings** (`/settings/ai`): **Auto-tagging** on for new saves since the 2026-10-12 Gemini test, **Auto-summarization** off, **Tag Style** lowercase with hyphens. Curated tags are still the 26 Jason selected on 2026-10-08 (`github`, `x`, `reddit`, `tools`, `agents`, and the rest of that set). The guest env points text and image inference at OpenRouter `google/gemini-2.5-flash-lite`. Eight existing items were retagged that day and stayed inside those 26 tags, then the rest of the library was retagged the same day. 844 bookmarks show tagging success. 71 still have an AI tag outside the 26.
+User Settings → **AI Settings** (`/settings/ai`): **Auto-tagging** on for new saves since the 2026-10-12 Gemini test, **Auto-summarization** off, **Tag Style** lowercase with hyphens. Curated tags are the 25 left after `tools` was removed on 2026-10-12 (26 when Jason selected them on 2026-10-08) (`github`, `x`, `reddit`, `tools`, `agents`, and the rest of that set). The guest env points text and image inference at OpenRouter `google/gemini-2.5-flash-lite`. Eight existing items were retagged that day and stayed inside those 25 tags, then the rest of the library was retagged the same day. 844 bookmarks show tagging success. 71 still have an AI tag outside the 25.
 
 Rules fire when a bookmark is added. They do not retag the imported set:
 
@@ -179,7 +179,7 @@ Installed from the host with the community script `ct/karakeep.sh` (unattended, 
 
 Updates later use the same script's update path inside the guest, or `update` from the helper script.
 
-**Version check (read only).** `curl -s http://192.168.30.33:3000/api/version` prints the running app version without a login (0.34.1 after the upgrade; 0.33.2 on 2026-11-01). Compare it with the latest upstream release (`https://github.com/karakeep-app/karakeep/releases`). Version tracking: the app floats on the community script's update path (no pin), Node is pinned to 22 (v22.23.4 live), Meilisearch is 1.54.3 (live, 2026-11-01), the OS is Debian 13.7, and the apt package `alloy` is held at 1.21.2. Do not switch this guest to Docker Compose without a decision. Node is pinned to 22 because Node 24.19 crashes `better-sqlite3` (upstream issue 2989).
+**Version check (read only).** `curl -s https://karakeep.yingson.com/api/version` prints the running app version without a login (0.34.1 after the upgrade; 0.33.2 on 2026-11-01). Compare it with the latest upstream release (`https://github.com/karakeep-app/karakeep/releases`). Version tracking: the app floats on the community script's update path (no pin), Node is 24 (nodejs 24.22.3 live, 2026-11-16), Meilisearch is 1.56.0 (live, 2026-11-16), the OS is Debian 13.7, and the apt package `alloy` is held at 1.21.2. Do not switch this guest to Docker Compose without a decision. Node was pinned to 22 until the 2026-11-01 upgrade because Node 24.19 crashed `better-sqlite3` (upstream issue 2989); there is no pin now.
 
 ## 10. Backup & Recovery
 
@@ -241,7 +241,7 @@ No Cloudflare hostname. Jason decided Tailscale only on 2026-10-08.
 - Load average and the context switch rate inside this guest are the Proxmox host's numbers (lxcfs passes them through), so they are not a guest health signal. Judge the guest by `/proc/pressure/*` and CPU seconds. Fix is a host change (lxcfs `-l`, WISH-274).
 - Kuma monitor 115 once took 27.9 s on 2026-10-27: that was the AdGuard outage INC-20261027-01, not Karakeep.
 - Swap is about 91 percent used (468 of 512 MiB on 2026-11-01) with memory pressure at 0.00. It holds cold pages, not live thrash. `LxcSwapFull` has fired for CT 136 since 2026-10-29. See WISH-186 and [BASELINES.md](BASELINES.md).
-- The curated tag count is written as 26 here and as 25 in one changelog entry. Jason has not settled which is right (review finding DOC-04).
+- The curated tag count is 25 (live read 2026-11-16: `users.settings` returns 25 `curatedTagIds`). This closes review finding DOC-04.
 
 ## 15. Operational Procedures
 
