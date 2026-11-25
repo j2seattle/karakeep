@@ -31,7 +31,7 @@ Every value here was observed on 2026-11-01 (Service Review run 1 and the fix ru
 
 | Field | Value |
 |---|---|
-| **Host** | CT 136, 2 vCPU / 4 GB RAM / 15 GB disk |
+| **Host** | CT 136, 2 vCPU / 4 GB RAM / 25 GB disk (grown from 15 GB online on 2026-11-25 at 87 percent; growth cause open, WISH-1251) |
 | **App version** | 0.33.2 (`curl https://karakeep.yingson.com/api/version`) |
 | **Typical load** | Idle archive. 7 day CPU mean 1.5 percent, peak 88 percent (Prometheus). Load average 4.7 to 5.9 on 2 vCPU is the Proxmox host's number, not this guest's (see Notes). |
 | **Measured over** | One window on 2026-11-01 (laptop on the LAN, 5 runs each), plus 7 day Prometheus queries |
