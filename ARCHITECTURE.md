@@ -48,7 +48,7 @@ last_verified: 2026-11-01
 
 Karakeep (formerly Hoarder) saves links, page archives, and screenshots. This lab copy is for Jason. Command Center and Prometheus read it (Prometheus scrapes its metrics). The laptop import script and the Cursor key call its API.
 
-The app is Karakeep **0.34.1** (upgraded by Jason 2026-11-01, Node 24, Meilisearch 1.56.0), installed by the Proxmox VE community script on 2026-10-08. It is not a Docker Compose stack.
+The app is Karakeep **0.35.0** (upgraded 2026-11-16, karakeep `docs/UPGRADE-0.35.0.md`; 0.34.1 by Jason 2026-11-01, Node 24, Meilisearch 1.56.0), installed by the Proxmox VE community script on 2026-10-08. It is not a Docker Compose stack.
 
 ## 2. Host & Runtime
 
