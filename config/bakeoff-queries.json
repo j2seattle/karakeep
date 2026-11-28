@@ -1,0 +1,10 @@
+{
+  "_about": "Five meaning queries for the Karakeep embedding bake-off (tutorial decision 2). Each names the bookmark that should come back near the top. Ids come from the sample analyses in lab-standards docs/proposals/librarian-semantic-watch.md (read 2026-11-28). Queries describe the page in other words than its title on purpose.",
+  "queries": [
+    {"q": "plugin that lets a coding agent keep working unattended overnight and leaves a morning receipt", "expect": "n377rlvxohary70rmpzz8i1m", "note": "Nightshift"},
+    {"q": "python library that draws diagrams and checks its own layout for overlaps", "expect": "tb99tx35zwtqahc94tss5wpg", "note": "open-diagram"},
+    {"q": "agent skill that writes prompts for an image model in ComfyUI", "expect": "q5kswmg2gnvphrh1ibpcay18", "note": "krea2 prompting skill"},
+    {"q": "native iPhone and Mac app for my self-hosted photo server", "expect": "y1acfyudsb3mg0iipd82po6o", "note": "Verso for Immich"},
+    {"q": "software that swaps a face in live video", "expect": "nh9kzado4aleoel9gebb07uy", "note": "Deep-Live-Cam"}
+  ]
+}
