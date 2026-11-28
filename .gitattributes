@@ -1,0 +1,6 @@
+# Files that run on Linux hosts must keep LF endings (a CRLF shows up as "bad interpreter ^M" far from its cause).
+*.sh      text eol=lf
+*.py      text eol=lf
+*.service text eol=lf
+*.timer   text eol=lf
+*.sql     text eol=lf
